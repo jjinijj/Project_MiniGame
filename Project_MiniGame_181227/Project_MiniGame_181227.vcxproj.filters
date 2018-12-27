@@ -1,0 +1,159 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="소스 파일">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="헤더 파일">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="리소스 파일">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="PlayGround">
+      <UniqueIdentifier>{f600e395-d111-45e3-ac10-04998001c732}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PlayGround\Camera">
+      <UniqueIdentifier>{09eec1c1-bfd2-4e38-84c0-291d658ff541}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="2DFrameWork">
+      <UniqueIdentifier>{a0c8d7f0-79e7-4596-92b1-279363e28cf9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="2DFrameWork\Image">
+      <UniqueIdentifier>{3e88be99-6800-4ac3-93f3-3a0dca7a9076}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="2DFrameWork\Data">
+      <UniqueIdentifier>{0e51457f-ec9b-4059-837c-e80a181e6be3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="2DFrameWork\UI">
+      <UniqueIdentifier>{5483c487-21d8-4e1a-9b7c-1c026a59815b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="2DFrameWork\Singletone">
+      <UniqueIdentifier>{1b9c715c-e2c5-49c6-a443-45d3a15b0ec6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="2DFrameWork\Utils">
+      <UniqueIdentifier>{29c30ae7-079a-422a-adf3-bf968418c05d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="2DFrameWork\Manager">
+      <UniqueIdentifier>{c478a4ca-350f-456c-a356-c0d535eebf5f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PlayGround\Player">
+      <UniqueIdentifier>{f317b0ac-b6a6-4063-939c-d67426fbcb02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="2DFrameWork\Animation">
+      <UniqueIdentifier>{c1833a9a-3b49-4c8f-ad87-aacdff5e265a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="scripts\randomFunction.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="scripts\resource.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="scripts\stdafx.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="scripts\targetver.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="scripts\minion.h">
+      <Filter>PlayGround</Filter>
+    </ClInclude>
+    <ClInclude Include="scripts\playGround.h">
+      <Filter>PlayGround</Filter>
+    </ClInclude>
+    <ClInclude Include="scripts\camera.h">
+      <Filter>PlayGround\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="scripts\d2dManager.h">
+      <Filter>2DFrameWork\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="scripts\image.h">
+      <Filter>2DFrameWork\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="scripts\imageManager.h">
+      <Filter>2DFrameWork\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="scripts\ImageLoader.h">
+      <Filter>2DFrameWork\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="scripts\txtData.h">
+      <Filter>2DFrameWork\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="scripts\utils.h">
+      <Filter>2DFrameWork\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="scripts\singletonBase.h">
+      <Filter>2DFrameWork\Singletone</Filter>
+    </ClInclude>
+    <ClInclude Include="scripts\progressBar.h">
+      <Filter>2DFrameWork\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="scripts\gameNode.h">
+      <Filter>2DFrameWork</Filter>
+    </ClInclude>
+    <ClInclude Include="scripts\keyManager.h">
+      <Filter>2DFrameWork\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="scripts\player.h">
+      <Filter>PlayGround\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="scripts\animation.h">
+      <Filter>2DFrameWork\Animation</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="scripts\stdafx.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="scripts\windowsAPI.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="scripts\minion.cpp">
+      <Filter>PlayGround</Filter>
+    </ClCompile>
+    <ClCompile Include="scripts\playGround.cpp">
+      <Filter>PlayGround</Filter>
+    </ClCompile>
+    <ClCompile Include="scripts\camera.cpp">
+      <Filter>PlayGround\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="scripts\d2dManager.cpp">
+      <Filter>2DFrameWork\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="scripts\image.cpp">
+      <Filter>2DFrameWork\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="scripts\imageManager.cpp">
+      <Filter>2DFrameWork\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="scripts\ImageLoader.cpp">
+      <Filter>2DFrameWork\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="scripts\txtData.cpp">
+      <Filter>2DFrameWork\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="scripts\utils.cpp">
+      <Filter>2DFrameWork\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="scripts\progressBar.cpp">
+      <Filter>2DFrameWork\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="scripts\gameNode.cpp">
+      <Filter>2DFrameWork</Filter>
+    </ClCompile>
+    <ClCompile Include="scripts\keyManager.cpp">
+      <Filter>2DFrameWork\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="scripts\player.cpp">
+      <Filter>PlayGround\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="scripts\animation.cpp">
+      <Filter>2DFrameWork\Animation</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
