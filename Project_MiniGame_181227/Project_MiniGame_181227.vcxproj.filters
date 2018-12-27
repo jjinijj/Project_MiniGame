@@ -22,9 +22,6 @@
     <Filter Include="2DFrameWork">
       <UniqueIdentifier>{a0c8d7f0-79e7-4596-92b1-279363e28cf9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="2DFrameWork\Image">
-      <UniqueIdentifier>{3e88be99-6800-4ac3-93f3-3a0dca7a9076}</UniqueIdentifier>
-    </Filter>
     <Filter Include="2DFrameWork\Data">
       <UniqueIdentifier>{0e51457f-ec9b-4059-837c-e80a181e6be3}</UniqueIdentifier>
     </Filter>
@@ -45,6 +42,12 @@
     </Filter>
     <Filter Include="2DFrameWork\Animation">
       <UniqueIdentifier>{c1833a9a-3b49-4c8f-ad87-aacdff5e265a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="2DFrameWork\Image">
+      <UniqueIdentifier>{3e88be99-6800-4ac3-93f3-3a0dca7a9076}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PlayGround\Object">
+      <UniqueIdentifier>{3626000a-f50b-4760-b3b7-914b9a386642}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -105,6 +108,12 @@
     <ClInclude Include="scripts\animation.h">
       <Filter>2DFrameWork\Animation</Filter>
     </ClInclude>
+    <ClInclude Include="scripts\gameObject.h">
+      <Filter>PlayGround\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="scripts\ObjectManager.h">
+      <Filter>PlayGround\Object</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="scripts\stdafx.cpp">
@@ -154,6 +163,12 @@
     </ClCompile>
     <ClCompile Include="scripts\animation.cpp">
       <Filter>2DFrameWork\Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="scripts\gameObject.cpp">
+      <Filter>PlayGround\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="scripts\OjbectManager.cpp">
+      <Filter>PlayGround\Object</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

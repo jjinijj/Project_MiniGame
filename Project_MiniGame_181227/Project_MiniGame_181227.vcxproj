@@ -122,11 +122,13 @@
     <ClInclude Include="scripts\camera.h" />
     <ClInclude Include="scripts\d2dManager.h" />
     <ClInclude Include="scripts\gameNode.h" />
+    <ClInclude Include="scripts\gameObject.h" />
     <ClInclude Include="scripts\image.h" />
     <ClInclude Include="scripts\ImageLoader.h" />
     <ClInclude Include="scripts\imageManager.h" />
     <ClInclude Include="scripts\keyManager.h" />
     <ClInclude Include="scripts\minion.h" />
+    <ClInclude Include="scripts\ObjectManager.h" />
     <ClInclude Include="scripts\player.h" />
     <ClInclude Include="scripts\playGround.h" />
     <ClInclude Include="scripts\progressBar.h" />
@@ -143,11 +145,13 @@
     <ClCompile Include="scripts\camera.cpp" />
     <ClCompile Include="scripts\d2dManager.cpp" />
     <ClCompile Include="scripts\gameNode.cpp" />
+    <ClCompile Include="scripts\gameObject.cpp" />
     <ClCompile Include="scripts\image.cpp" />
     <ClCompile Include="scripts\ImageLoader.cpp" />
     <ClCompile Include="scripts\imageManager.cpp" />
     <ClCompile Include="scripts\keyManager.cpp" />
     <ClCompile Include="scripts\minion.cpp" />
+    <ClCompile Include="scripts\OjbectManager.cpp" />
     <ClCompile Include="scripts\player.cpp" />
     <ClCompile Include="scripts\playGround.cpp" />
     <ClCompile Include="scripts\progressBar.cpp" />
