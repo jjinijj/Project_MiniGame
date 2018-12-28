@@ -12,7 +12,7 @@ enum
 	// 속도
 	PLAYER_IDLE_SPEED = 10,
 	PLAYER_ATTACK_SPEED = 3,
-	PLAYER_MOVE_SPEED = 5,
+	PLAYER_MOVE_SPEED = 3,
 
 	// 플레이어 한 프레임 이미지 크기
 	PLAYER_SIZE_WIDE = 142,
@@ -24,6 +24,13 @@ enum
 	PLAYER_COL_SIZE_HEIGHT = 125,
 	PLAYER_COL_SIZE_WIDE_HALF = PLAYER_COL_SIZE_WIDE / 2,
 	PLAYER_COL_SIZE_HEIGHT_HALF = PLAYER_COL_SIZE_HEIGHT / 2,
+
+	// 플레이어 무적 시간
+	PLAYER_INVINCIBILITY_TIME = 50,
+
+	// 플레이어 점프 파워
+	PLAYER_JUMP_POWER = 8,
+	PLAYER_GRAVITY = 2,
 
 };
 
@@ -46,13 +53,13 @@ enum ePLAYER_STATE
 	ePLAYER_STATE_FLYING,
 	ePLAYER_STATE_FALLING,
 	ePLAYER_STATE_LAND,
-	ePLAYER_STATE_HIT,
+	//ePLAYER_STATE_HIT,
 
 	ePLAYER_STATE_NONE,
 	ePLAYER_STATE_COUNT = ePLAYER_STATE_NONE,
 };
 
-enum eDirection
+enum eDIRECTION
 {
 	eDIRECTION_RIGHT,
 	eDIRECTION_LEFT,
@@ -65,17 +72,17 @@ enum eDirection
 };
 
 
+class objectManager;
+class bulletManager;
 class player: public gameNode
 {
 private:
 	map<ePLAYER_STATE, animation*> _animMap;
-	
+	map<ePLAYER_STATE, animation*>::iterator _ianiMap;
 	ePLAYER_STATE _state;
-	eDirection _dir_LR;
-	eDirection _dir_UD;
+	eDIRECTION _dir_LR;
+	eDIRECTION _dir_UD;
 	animation* _anim;
-	ePLAYER_STATE _beforeState;
-	ePLAYER_STATE _nextState;
 
 	POINTF _position;	// middle, bottom
 	POINT _size;
@@ -84,20 +91,28 @@ private:
 	RECTF _collision;	// 플레이어 충돌체
 	RECTF _collisionAtk; // 공격 충돌체
 	
-	
-	
-	
-	RECTF _collisionChair; // 의자 테스트용
-	
-	int _jumpCount;
+	float _jumpPower;
+	float _gravity;
+
+	float _jumpHeight;
 	bool _isFloating;
 	bool _isAttack2Ready;
 	bool _isAlive;
+	bool _isJumpKeyUp;		
 
 	int _drowsingCntDown;
 	int _invinCntDown;		// 무적상태 : 피격당했을 때
 
 	bool _showRect;
+	
+	objectManager* _objM;
+	bulletManager* _bulletM;
+
+	
+	
+	
+	// 테스트용
+	RECTF _collisionChair; // 의자 테스트용
 
 public:
 	player();
@@ -108,17 +123,21 @@ public:
 	virtual void update();
 	virtual void render();
 
-	void move();
-	void changeState(ePLAYER_STATE state);
-	bool isStateCheck_Attack() {	return ((ePLAYER_STATE_ATTACK_1 == _state) || (ePLAYER_STATE_ATTACK_2 == _state) || (ePLAYER_STATE_ATTACK_3 == _state) ||
-											(ePLAYER_STATE_ATTACK_UP == _state) || (ePLAYER_STATE_ATTACK_DOWN == _state)); }
-	bool isStateFloating() {return  _isFloating; }
-
-	void updateCollision();
-
-	bool checkInteractionObject();
-
 	void resetPlayer();
+	void move();
+	void updateCollision();
+	void changeState(ePLAYER_STATE state);
+	void evaluateEvent();
+
+	void setManagerLink(objectManager* objM, bulletManager* bulletM) {_objM = objM; _bulletM = bulletM;}
 	
+	bool checkInteractionObject();
+	bool checkPlayOntheGround();
+	bool isStateCheck_Attack() { return ((ePLAYER_STATE_ATTACK_1 == _state) || (ePLAYER_STATE_ATTACK_2 == _state) || (ePLAYER_STATE_ATTACK_3 == _state) ||
+										(ePLAYER_STATE_ATTACK_UP == _state) || (ePLAYER_STATE_ATTACK_DOWN == _state)); }
+	bool isMoveable()			{ return (ePLAYER_STATE_SIT != _state) && (ePLAYER_STATE_DROWSE != _state);}
+	bool isStateFloating()		{return  _isFloating; }
+
+
 
 };

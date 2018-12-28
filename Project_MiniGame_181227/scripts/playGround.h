@@ -1,14 +1,15 @@
 #pragma once
 #include "gameNode.h"
 #include "player.h"
+#include "ObjectManager.h"
 
 #define ENEMY_MAX 18
 
 class playGround : public gameNode
 {
 private:
-	player _player;
-
+	player*			_player;
+	objectManager*	_objManager;
 
 	bool _isDataLoaded;
 

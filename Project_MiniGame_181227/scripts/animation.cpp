@@ -9,7 +9,7 @@ animation::~animation()
 {
 }
 
-void animation::init(image* img, bool isLoop, int startIdx, int endIdx, int frameCycle, int frameY, int loopStartIdx)
+HRESULT animation::init(image* img, bool isLoop, int startIdx, int endIdx, int frameCycle, int frameY, int loopStartIdx)
 {
 	_image = img;
 
@@ -29,11 +29,31 @@ void animation::init(image* img, bool isLoop, int startIdx, int endIdx, int fram
 	_count = 0;
 	_curFrameX = _startIdx;
 
+	_eventFrameX = -1; // 이벤트 프레임 없음으로 초기화
+	_isReverse = false;	// 정방향 재생
+
+	return S_OK;
+}
+
+void animation::release()
+{
+}
+
+void animation::update()
+{
+	if(_isReverse)
+		playReverse();
+	else
+		play();
 }
 
 void animation::start()
 {
-	_curFrameX = _startIdx;
+	if(_isReverse)
+		_curFrameX = _endIdx;
+	else
+		_curFrameX = _startIdx;
+
 	_isPlaying = true;
 
 }

@@ -21,6 +21,7 @@ HRESULT playGround::init()
 		_isDataLoaded = true;
 	}
 
+	// 플레이어
 	IMAGEMANAGER->addFrameImage("knight_idle", L"image/knight_idle.png", 568, 266, 4, 2);
 	IMAGEMANAGER->addFrameImage("knight_attack_down", L"image/knight_attack_down.png", 852, 266, 6, 2);
 	IMAGEMANAGER->addFrameImage("knight_attack_up", L"image/knight_attack_up.png", 852, 266, 6, 2);
@@ -34,7 +35,44 @@ HRESULT playGround::init()
 	IMAGEMANAGER->addFrameImage("knight_sitAnddrowse", L"image/knight_sitAnddrowse.png", 568, 266, 4, 2);
 	IMAGEMANAGER->addFrameImage("knight_walk", L"image/knight_walk.png", 852, 266, 6, 2);
 
-	_player.init();
+	_player = new player;
+	_player->init();
+
+	_objManager = new objectManager;
+	_objManager->init();
+
+	_player->setManagerLink(_objManager, nullptr);
+
+	{
+		objectGround* ground = new objectGround;
+		ground->init(100, 600, 500, 100);
+		_objManager->pushBackObject(ground);
+	}
+	{
+		objectGround* ground = new objectGround;
+		ground->init(240, 400, 100, 100);
+		_objManager->pushBackObject(ground);
+	}
+	{
+		objectGround* ground = new objectGround;
+		ground->init(800, 600, 500, 100);
+		_objManager->pushBackObject(ground);
+	}
+	{
+		objectGround* ground = new objectGround;
+		ground->init(700, 800, 100, 100);
+		_objManager->pushBackObject(ground);
+	}
+	{
+		objectGround* ground = new objectGround;
+		ground->init(300, 800, 500, 100);
+		_objManager->pushBackObject(ground);
+	}
+	{
+		objectGround* ground = new objectGround;
+		ground->init(600, 100, 1000, 100);
+		_objManager->pushBackObject(ground);
+	}
 
 	return S_OK;
 }
@@ -43,15 +81,19 @@ void playGround::release()
 {
 	gameNode::release();
 
-	_player.release();
-	
+	SAFE_RELEASE(_player);
+	SAFE_DELETE(_player);
+
+	SAFE_RELEASE(_objManager);
+	SAFE_DELETE(_objManager);
 }
 
 void playGround::update()
 {
 	gameNode::update();
 
-	_player.update();
+	_player->update();
+	_objManager->update();
 }
 
 void playGround::render()
@@ -62,18 +104,8 @@ void playGround::render()
 	//===========================================================================
 	//				##		여기에 코드 작성(Start)		##
 
-
-	_player.render();
-
-	for (int i = 0; i < 10; i++)
-	for (int j = 0; j < 10; j++)
-	{
-		//IMAGEMANAGER->findImage("테스트")->frameRender(j * 200, i * 200, _index, 0, 1);
-	}
-
-	//IMAGEMANAGER->findImage("knight_idle")->frameRender(100, 100, _index, 0, 1);
-
-	
+	_objManager->render();
+	_player->render();
 
 	//D2DMANAGER->_renderTarget->CreateLayer()
 	//				##		여기에 코드 작성(End)		##

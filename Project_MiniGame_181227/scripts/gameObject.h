@@ -2,13 +2,12 @@
 #include "gameNode.h"
 #include "image.h"
 
-
-
 enum eOBJECT_TYPE
 {
 	eOBJECT_CHAIR,
 	eOBJECT_COIN,
 	eOBJECT_CHARM,
+	eOBJECT_GROUND,
 
 	eOBJECT_TYPE_NONE,
 	eOBJECT_TYPE_COUNT = eOBJECT_TYPE_NONE,
@@ -30,12 +29,28 @@ protected:
 	image* _img;
 	POINTF _position;
 	POINT _size;
-	D2D1_RECT_F _collision;
+	RECT _collision;
+	RECT _collisionPoint;
+
+	eOBJECT_TYPE _type;
+	int _subType;
 	
 public:
 	gameObject();
 	~gameObject();
 
 	HRESULT init();
+	void render();
+	void update();
+	
+	const RECT& getCollision() {return _collision;}
+	const RECT& getCollisionPoint() {return _collisionPoint;}
+	eOBJECT_TYPE getType() {return _type;}
+	int getSubType() {return _subType;}
+};
 
+class objectGround: public gameObject
+{
+public:
+	HRESULT init(float x, float y, int width, int height);
 };

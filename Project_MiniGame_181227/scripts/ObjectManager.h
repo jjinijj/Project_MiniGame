@@ -5,27 +5,25 @@
 #include <map>
 using namespace std;
 
+
+typedef list<gameObject*>::iterator		ilObject;
+typedef list<gameObject*>				lObject;
+
 class objectManager : public singletonBase<objectManager>
 {
 private:
-	typedef map<eOBJECT_TYPE, list<gameObject*>>			mObject;
-	typedef map<eOBJECT_TYPE, list<gameObject*>>::iterator	miObject;
-	typedef list<gameObject*>								lObject;
-	typedef list<gameObject*>::iterator						liObject;
-
-private:
-	mObject		_objMap;
-	miObject	_iter_map;
-	liObject	_iter_list;
+	lObject		_objList;
+	ilObject	_iobjList;
 
 public:
 
-	lObject* getObjectList(eOBJECT_TYPE type) 
-	{ 
-		if(_objMap.find(type) != _objMap.end())
-			return  &_objMap[type];
+	void init();
+	void update();
+	void render();
+	void release();
 
-		return nullptr;
-	}
+	void pushBackObject(gameObject* gObject);
+	lObject* getObjectList(eOBJECT_TYPE type);
+
 
 };

@@ -52,4 +52,11 @@ namespace JJINS_UTIL
 
 		return false;
 	}
+
+	// warrning
+	inline RECT ConvertRECTFtoRECT(RECTF rcf)
+	{
+		RECT rc = {(int)rcf.left, (int)rcf.top, (int)rcf.right, (int)rcf.bottom};
+		return rc;
+	}
 }

@@ -151,7 +151,7 @@
     <ClCompile Include="scripts\imageManager.cpp" />
     <ClCompile Include="scripts\keyManager.cpp" />
     <ClCompile Include="scripts\minion.cpp" />
-    <ClCompile Include="scripts\OjbectManager.cpp" />
+    <ClCompile Include="scripts\ObjectManager.cpp" />
     <ClCompile Include="scripts\player.cpp" />
     <ClCompile Include="scripts\playGround.cpp" />
     <ClCompile Include="scripts\progressBar.cpp" />

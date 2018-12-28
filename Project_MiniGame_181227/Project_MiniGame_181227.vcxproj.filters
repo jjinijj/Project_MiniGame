@@ -108,10 +108,10 @@
     <ClInclude Include="scripts\animation.h">
       <Filter>2DFrameWork\Animation</Filter>
     </ClInclude>
-    <ClInclude Include="scripts\gameObject.h">
+    <ClInclude Include="scripts\ObjectManager.h">
       <Filter>PlayGround\Object</Filter>
     </ClInclude>
-    <ClInclude Include="scripts\ObjectManager.h">
+    <ClInclude Include="scripts\gameObject.h">
       <Filter>PlayGround\Object</Filter>
     </ClInclude>
   </ItemGroup>
@@ -164,10 +164,10 @@
     <ClCompile Include="scripts\animation.cpp">
       <Filter>2DFrameWork\Animation</Filter>
     </ClCompile>
-    <ClCompile Include="scripts\gameObject.cpp">
+    <ClCompile Include="scripts\ObjectManager.cpp">
       <Filter>PlayGround\Object</Filter>
     </ClCompile>
-    <ClCompile Include="scripts\OjbectManager.cpp">
+    <ClCompile Include="scripts\gameObject.cpp">
       <Filter>PlayGround\Object</Filter>
     </ClCompile>
   </ItemGroup>

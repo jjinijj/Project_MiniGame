@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "player.h"
-#include "gameObject.h"
+#include "ObjectManager.h"
 
 player::player()
 {
@@ -11,8 +11,6 @@ player::~player()
 }
 
 
-
-const int testY = 500;
 
 HRESULT player::init()
 {
@@ -31,6 +29,7 @@ HRESULT player::init()
 
 		animation* anim = new animation;
 		anim->init(img, false, 0, img->GetMaxFrameX(), PLAYER_ATTACK_SPEED, (int)_dir_LR);
+		anim->SetEventFrameX(1);
 		_animMap.insert(make_pair(ePLAYER_STATE_ATTACK_DOWN, anim));
 	}
 
@@ -40,6 +39,7 @@ HRESULT player::init()
 
 		animation* anim = new animation;
 		anim->init(img, false, 0, img->GetMaxFrameX(), PLAYER_ATTACK_SPEED, (int)_dir_LR);
+		anim->SetEventFrameX(1);
 		_animMap.insert(make_pair(ePLAYER_STATE_ATTACK_UP, anim));
 	}
 
@@ -49,6 +49,7 @@ HRESULT player::init()
 
 		animation* anim = new animation;
 		anim->init(img, false, 0, img->GetMaxFrameX(), PLAYER_ATTACK_SPEED, (int)_dir_LR);
+		anim->SetEventFrameX(2);
 		_animMap.insert(make_pair(ePLAYER_STATE_ATTACK_1, anim));
 	}
 
@@ -58,6 +59,7 @@ HRESULT player::init()
 
 		animation* anim = new animation;
 		anim->init(img, false, 0, img->GetMaxFrameX(), PLAYER_ATTACK_SPEED, (int)_dir_LR);
+		anim->SetEventFrameX(1);
 		_animMap.insert(make_pair(ePLAYER_STATE_ATTACK_2, anim));
 	}
 
@@ -67,6 +69,7 @@ HRESULT player::init()
 
 		animation* anim = new animation;
 		anim->init(img, false, 0, img->GetMaxFrameX(), PLAYER_ATTACK_SPEED, (int)_dir_LR);
+		anim->SetEventFrameX(4);
 		_animMap.insert(make_pair(ePLAYER_STATE_ATTACK_3, anim));
 	}
 
@@ -90,7 +93,7 @@ HRESULT player::init()
 		}
 		{
 			animation* anim = new animation;
-			anim->init(img, true, 3, 4, PLAYER_MOVE_SPEED, (int)_dir_LR);
+			anim->init(img, false, 3, 4, PLAYER_MOVE_SPEED, (int)_dir_LR);
 			_animMap.insert(make_pair(ePLAYER_STATE_FLYING, anim));
 		}
 		{
@@ -152,13 +155,17 @@ HRESULT player::init()
 
 	resetPlayer();
 
-
-
 	return S_OK;
 }
 
 void player::release()
 {
+	for (_ianiMap = _animMap.begin(); _animMap.end() != _ianiMap; ++_ianiMap)
+	{
+		(*_ianiMap).second->release();
+	}
+
+	_animMap.clear();
 }
 
 void player::update()
@@ -176,7 +183,7 @@ void player::update()
 	if ( KEYMANAGER->isOnceKeyDown('E') )
 	{
 		//changeState(ePLAYER_STATE_HIT);
-		_invinCntDown = 100;
+		_invinCntDown = PLAYER_INVINCIBILITY_TIME;
 	}
 	if( _invinCntDown == 0 )
 		_invinCntDown = -1;
@@ -251,29 +258,57 @@ void player::update()
 					changeState(ePLAYER_STATE_LOOK_DOWN);
 				}
 			}
+			//점프
 			else if ( KEYMANAGER->isOnceKeyDown('Z') )
 			{
 				if ( ePLAYER_STATE_IDLE == _state || ePLAYER_STATE_WALK == _state )
 				{
 					_isFloating = true;
-					_beforeState = _state;
+					_isJumpKeyUp = false;
+					_jumpPower = (float)PLAYER_JUMP_POWER;
+					_jumpHeight = 0.f;
 					changeState(ePLAYER_STATE_JUMP);
 				}
 			}
 
 			if ( KEYMANAGER->isStayKeyDown(VK_LEFT) )
 			{
-				_position.x -= 5;
+				if (isMoveable())
+				{
+					_position.x -= 5;
+					if(_position.x < 0)
+						_position.x = 0;
+				}
 
-				if ( ePLAYER_STATE_NONE == _state || ePLAYER_STATE_IDLE == _state || ePLAYER_STATE_LAND == _state )
-					changeState(ePLAYER_STATE_WALK);
+				if (ePLAYER_STATE_WALK != _state)
+				{
+					_dir_LR = eDIRECTION_LEFT;
+					if (_anim)
+						_anim->SetFrameY(_dir_LR);
+
+					if (ePLAYER_STATE_NONE == _state || ePLAYER_STATE_IDLE == _state || ePLAYER_STATE_LAND == _state)
+						changeState(ePLAYER_STATE_WALK);
+				}
 			}
 
 			if ( KEYMANAGER->isStayKeyDown(VK_RIGHT) )
 			{
-				_position.x += 5;
-				if ( ePLAYER_STATE_NONE == _state || ePLAYER_STATE_IDLE == _state || ePLAYER_STATE_LAND == _state )
-					changeState(ePLAYER_STATE_WALK);
+				if (isMoveable())
+				{
+					_position.x += 5;
+					if (WINSIZEX < _position.x)
+						_position.x = 0;
+				}
+
+				if (ePLAYER_STATE_WALK != _state)
+				{
+					_dir_LR = eDIRECTION_RIGHT;
+					if (_anim)
+						_anim->SetFrameY(_dir_LR);
+
+					if (ePLAYER_STATE_NONE == _state || ePLAYER_STATE_IDLE == _state || ePLAYER_STATE_LAND == _state)
+						changeState(ePLAYER_STATE_WALK);
+				}
 			}
 		}
 
@@ -292,7 +327,7 @@ void player::update()
 				changeState(ePLAYER_STATE_IDLE);
 			}
 		}
-		if ( eDIRECTION_UP == _dir_UD && KEYMANAGER->isOnceKeyUp(VK_UP) )
+		if ( KEYMANAGER->isOnceKeyUp(VK_UP) )
 		{
 			_dir_UD = eDIRECTION_NONE;
 			if ( ePLAYER_STATE_LOOK_UP == _state )
@@ -300,7 +335,7 @@ void player::update()
 				changeState(ePLAYER_STATE_IDLE);
 			}
 		}
-		else if ( eDIRECTION_DOWN == _dir_UD && KEYMANAGER->isOnceKeyUp(VK_DOWN) )
+		else if ( KEYMANAGER->isOnceKeyUp(VK_DOWN) )
 		{
 			_dir_UD = eDIRECTION_NONE;
 			if ( ePLAYER_STATE_LOOK_DOWN == _state )
@@ -340,39 +375,79 @@ void player::update()
 				changeState(ePLAYER_STATE_ATTACK_1);
 			}
 		}
+		// 원거리 공격
+		if (KEYMANAGER->isOnceKeyDown('A'))
+		{
+			// 조건체크
+			//if()
+			{
+				changeState(ePLAYER_STATE_ATTACK_3);
+				//todo : 스킬게이지 소모
+			}
+		}
 
 		// 점프
 		if ( ePLAYER_STATE_JUMP == _state )
 		{
-			_position.y -= 5;
+			if (!KEYMANAGER->isStayKeyDown('Z'))
+				_isJumpKeyUp = true;
+		
+			_position.y -= _jumpPower;
+			_jumpHeight += _jumpPower;
 		}
 		else if ( ePLAYER_STATE_FLYING == _state )
 		{
-			// 점프키를 누르고 있지 않다면
-			if ( !KEYMANAGER->isStayKeyDown('Z') )
+			if ( KEYMANAGER->isStayKeyDown('Z') && !_isJumpKeyUp)
 			{
-				changeState(ePLAYER_STATE_FALLING);
+				if( _jumpHeight < PLAYER_COL_SIZE_HEIGHT * 1.5f)
+					_jumpPower = (float)PLAYER_JUMP_POWER;
 			}
-			_position.y -= 5;
+			else
+				_isJumpKeyUp = true;
+
+			_position.y -= _jumpPower;
+			_jumpPower -= _gravity;
+
+			_jumpHeight += _jumpPower;
+
+			if(_jumpPower < 0)
+				changeState(ePLAYER_STATE_FALLING);
 		}
 		else if ( ePLAYER_STATE_FALLING == _state )
 		{
-			_position.y += 5;
-			if ( testY < _position.y )
-			{
-				_position.y = testY;
-				_isFloating = false;
+			_position.y -= _jumpPower;
+			_jumpPower -= _gravity;
+			if(_jumpPower < -PLAYER_JUMP_POWER)
+				_jumpPower = -(float)PLAYER_JUMP_POWER;
 
-				changeState(ePLAYER_STATE_LAND);
+			if (WINSIZEY < _position.y)
+			{
+				_position.x = 0;
+				_position.y = 0;
 			}
+
+			//if ( testY < _position.y )
+			//{
+			//	_position.y = testY;
+			//	_isFloating = false;
+			//
+			//	changeState(ePLAYER_STATE_LAND);
+			//}
 		}
 		else if ( _isFloating )
 		{
-			_position.y += 5;
-			if ( testY < _position.y )
+			if (ePLAYER_STATE_ATTACK_3 != _state)
 			{
-				_position.y = testY;
-				_isFloating = false;
+				_position.y -= _jumpPower;
+				_jumpPower -= _gravity;
+				if (_jumpPower < -PLAYER_JUMP_POWER)
+					_jumpPower = -(float)PLAYER_JUMP_POWER;
+
+				if (WINSIZEY < _position.y)
+				{
+					_position.x = 0;
+					_position.y = 0;
+				}
 			}
 		}
 
@@ -416,10 +491,6 @@ void player::update()
 			{
 				changeState(ePLAYER_STATE_FLYING);
 			}
-			else if (ePLAYER_STATE_FLYING == _state)
-			{
-				changeState(ePLAYER_STATE_FALLING);
-			}
 			else if ( ePLAYER_STATE_LAND == _state )
 			{
 				changeState(ePLAYER_STATE_IDLE);
@@ -430,17 +501,36 @@ void player::update()
 				return;
 			}
 		}
-		_anim->play();
+		_anim->update();
 	}
 
 	updateCollision();
+	evaluateEvent();
+	
+	if (!checkPlayOntheGround())
+	{
+		if (!_isFloating)
+		{
+			changeState(ePLAYER_STATE_FALLING);
+			_isFloating = true;
+		}
+	}
+	else if(_isFloating)
+	{
+		_isFloating = false;
+		changeState(ePLAYER_STATE_LAND);
+	}
+	else
+	{
+
+	}
 }
 
 void player::render()
 {
 
 	WCHAR str[128];
-	swprintf_s(str, L"[%.2f][%.2f] [state :%d] [jumpCount : %d] [%d]", _position.x, _position.y, _state, _jumpCount, _isAttack2Ready);
+	swprintf_s(str, L"[%.2f][%.2f] [state :%d] [%.2f]", _position.x, _position.y, _state, _jumpHeight);
 	D2DMANAGER->drawTextD2D(D2DMANAGER->_defaultBrush, L"나눔고딕", 15.0f
 							, str
 							, CAMERA->getPosX() + 500
@@ -465,11 +555,31 @@ void player::render()
 	if ( _anim )
 	{
 		if(0 < _invinCntDown )
-			_anim->render(_position.x - PLAYER_SIZE_WIDE_HALF, _position.y - PLAYER_SIZE_HEIGHT, 0.5f);
+			_anim->render(_position.x - PLAYER_SIZE_WIDE_HALF, _position.y - PLAYER_SIZE_HEIGHT, 1 - (_invinCntDown % 10 * 0.1));
 		else
 			_anim->render(_position.x - PLAYER_SIZE_WIDE_HALF, _position.y - PLAYER_SIZE_HEIGHT);
 	}
 
+}
+
+void player::resetPlayer()
+{
+	_collisionChair = { 500, 400, 700, 500 };
+
+	_dir_LR = eDIRECTION_RIGHT;
+
+	_position.x = 100;
+	_position.y = 500;
+
+	_size = { PLAYER_SIZE_WIDE, PLAYER_SIZE_HEIGHT };
+	_atkRange = { 100, 25 };
+
+	_anim = _animMap[ePLAYER_STATE_IDLE];
+	_anim->start();
+
+	_gravity = (float)PLAYER_GRAVITY;
+
+	_isAlive = true;
 }
 
 void player::move()
@@ -500,9 +610,11 @@ void player::changeState(ePLAYER_STATE state)
 
 void player::updateCollision()
 {
-	_collision = {	  _position.x - PLAYER_COL_SIZE_WIDE_HALF, _position.y - PLAYER_COL_SIZE_HEIGHT
-					, _position.x + PLAYER_COL_SIZE_WIDE_HALF, _position.y};
+	// 플레이어
+	_collision = {  _position.x - PLAYER_COL_SIZE_WIDE_HALF, _position.y - PLAYER_COL_SIZE_HEIGHT
+				  , _position.x + PLAYER_COL_SIZE_WIDE_HALF, _position.y};
 
+	// 공격범위
 	if ( ePLAYER_STATE_ATTACK_1 == _state || ePLAYER_STATE_ATTACK_2 == _state )
 	{
 		if ( eDIRECTION_RIGHT == _dir_LR )
@@ -515,15 +627,33 @@ void player::updateCollision()
 	else if ( ePLAYER_STATE_ATTACK_UP == _state )
 	{
 		_collisionAtk = { _position.x - _atkRange.y, _collision.top - _atkRange.x
-							, _position.x + _atkRange.y, _collision.top };
+						, _position.x + _atkRange.y, _collision.top };
 	}
 	else if(ePLAYER_STATE_ATTACK_DOWN == _state )
 	{
 		_collisionAtk = { _position.x - _atkRange.y, _collision.bottom
-							, _position.x + _atkRange.y, _collision.bottom + _atkRange.x };
+						, _position.x + _atkRange.y, _collision.bottom + _atkRange.x };
 	}
 	else
 		_collisionAtk = {};
+}
+
+void player::evaluateEvent()
+{
+	if (_anim->IsEventFrame())
+	{
+		switch (_state)
+		{
+			case ePLAYER_STATE_ATTACK_1:
+			case ePLAYER_STATE_ATTACK_2:
+			case ePLAYER_STATE_ATTACK_3:
+			case ePLAYER_STATE_ATTACK_UP:
+			case ePLAYER_STATE_ATTACK_DOWN:
+			{
+				break;
+			}
+		}
+	}
 }
 
 bool player::checkInteractionObject()
@@ -536,27 +666,41 @@ bool player::checkInteractionObject()
 
 	if ( IntersectRect(&temp, &col, &colChair) )
 	{
-		changeState(ePLAYER_STATE_SIT);
-		return true;
+		if (PLAYER_COL_SIZE_WIDE_HALF <= temp.right - temp.left)
+		{
+			changeState(ePLAYER_STATE_SIT);
+			return true;
+		}
 	}
 
 	return false;
 }
 
-void player::resetPlayer()
+bool player::checkPlayOntheGround()
 {
-	_collisionChair = { 500, 400, 700, 500 };
+	if(nullptr == _objM)
+		return false;
 
-	_dir_LR = eDIRECTION_RIGHT;
+	lObject* objList = _objM->getObjectList(eOBJECT_GROUND);
+	
+	if(objList->size() == 0)
+		return false;
 
-	_position.x = 100;
-	_position.y = testY;
+	ilObject end = objList->end();
+	for (ilObject iter = objList->begin(); end != iter; ++iter)
+	{
+		gameObject* obj = (*iter);
+		RECT temp;
+		RECT playerCol	= ConvertRECTFtoRECT(_collision);
+		RECT objCol		= (obj->getCollision());
+		RECT objColPoint= (obj->getCollisionPoint());
+		if (IntersectRect(&temp, &playerCol, &objColPoint))
+		{
+			_position.y = objColPoint.top + 1;
+			return true;
+		}
+	}
 
-	_size = { PLAYER_SIZE_WIDE, PLAYER_SIZE_HEIGHT };
-	_atkRange = { 100, 25 };
-
-	_anim = _animMap[ePLAYER_STATE_IDLE];
-	_anim->start();
-
-	_isAlive = true;
+	return false;
 }
+
