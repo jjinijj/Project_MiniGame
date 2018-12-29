@@ -118,12 +118,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="scripts\actor.h" />
-    <ClInclude Include="scripts\actorManager.h" />
     <ClInclude Include="scripts\animation.h" />
     <ClInclude Include="scripts\camera.h" />
     <ClInclude Include="scripts\collision.h" />
     <ClInclude Include="scripts\d2dManager.h" />
+    <ClInclude Include="scripts\enemy.h" />
+    <ClInclude Include="scripts\enemyManager.h" />
     <ClInclude Include="scripts\gameNode.h" />
     <ClInclude Include="scripts\gameObject.h" />
     <ClInclude Include="scripts\image.h" />
@@ -144,12 +144,12 @@
     <ClInclude Include="scripts\utils.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="scripts\actor.cpp" />
-    <ClCompile Include="scripts\actorManager.cpp" />
     <ClCompile Include="scripts\animation.cpp" />
     <ClCompile Include="scripts\camera.cpp" />
     <ClCompile Include="scripts\collision.cpp" />
     <ClCompile Include="scripts\d2dManager.cpp" />
+    <ClCompile Include="scripts\enemy.cpp" />
+    <ClCompile Include="scripts\enemyManager.cpp" />
     <ClCompile Include="scripts\gameNode.cpp" />
     <ClCompile Include="scripts\gameObject.cpp" />
     <ClCompile Include="scripts\image.cpp" />

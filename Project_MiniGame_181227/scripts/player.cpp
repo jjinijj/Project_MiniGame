@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "player.h"
 #include "ObjectManager.h"
+#include "enemyManager.h"
 
 player::player()
 {
@@ -189,8 +190,6 @@ void player::update()
 		_invinCntDown = -1;
 	else if(0 < _invinCntDown )
 		--_invinCntDown;
-
-
 
 
 	if ( _isAlive )
@@ -631,27 +630,64 @@ void player::updateCollision()
 	else
 		_collisionAtk = {};
 
-	// ¹Ù´Ú
-	_collisionBot = {(int)_collision.left, ( int )_collision.bottom, ( int )_collision.right, ( int )_collision.bottom + 2};
 }
 
 void player::evaluateEvent()
 {
-	if (_anim->IsEventFrame())
+	if (_anim->IsEventFrame() && !_anim->isDoEvent())
 	{
 		switch (_state)
 		{
 			case ePLAYER_STATE_ATTACK_1:
 			case ePLAYER_STATE_ATTACK_2:
-			case ePLAYER_STATE_ATTACK_3:
 			case ePLAYER_STATE_ATTACK_UP:
 			case ePLAYER_STATE_ATTACK_DOWN:
 			{
+				attackbySword();
+				_anim->SetEventFlag(true);
+				break;
+			}
+
+			case ePLAYER_STATE_ATTACK_3:
+			{
+				attackbyBullet();
+				_anim->SetEventFlag(true);
 				break;
 			}
 		}
 	}
 }
+
+void player::attackbySword()
+{
+	if( nullptr == _enemyM )
+		return;
+
+	const lEnemy& enemyList = _enemyM->getEnemyList();
+	if( 0 == enemyList.size())
+		return;
+
+	list<int> hitEnemyVector;
+	cilEnemy end = enemyList.end();
+	for ( cilEnemy iter = enemyList.begin(); end != iter; ++iter )
+	{
+		enemy* em = *iter;
+		RECT col = em->getCollision();
+		if( CheckIntersectRect(_collisionAtk, col) )
+		{
+			hitEnemyVector.push_back(em->getUid());
+		}
+	}
+
+	for( list<int>::iterator it = hitEnemyVector.begin(); hitEnemyVector.end() != it; ++it )
+		_enemyM->hitEnemy(*it);
+}
+
+void player::attackbyBullet()
+{
+}
+
+
 
 bool player::checkInteractionObject()
 {

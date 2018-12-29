@@ -9,6 +9,7 @@ private:
 	bool _isLoop;		// 루프 할?
 	bool _isPlaying;	// 애니메이션 실행 중?
 	bool _isReverse;	// 역재생?
+	bool _doEvent;
 	
 	int _startIdx;		// 프레임 시작 index
 	int _loopStartIdx;	// 루프 프레임 시작 index
@@ -49,11 +50,15 @@ public:
 	// 이벤트 프레임 설정
 	void SetEventFrameX(int frameX) {_eventFrameX = frameX;}
 
+	void SetEventFlag(bool flag) {_doEvent = flag;}
+
 	// 플레이 여부 확인
 	bool IsPlayingAnimation() {return _isPlaying;}
 
 	// 이벤트 프레임?
 	bool IsEventFrame() {return (_curFrameX == _eventFrameX);}
+
+	bool isDoEvent() {return _doEvent;}
 
 private:
 	// 플레이

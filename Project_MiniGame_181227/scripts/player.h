@@ -74,6 +74,7 @@ enum eDIRECTION
 
 class objectManager;
 class bulletManager;
+class enemyManager;
 class player: public gameNode
 {
 private:
@@ -90,7 +91,6 @@ private:
 
 	RECT _collision;	// 플레이어 충돌체
 	RECT _collisionAtk; // 공격 충돌체
-	RECT _collisionBot;
 	
 	float _jumpPower;
 	float _gravity;
@@ -101,13 +101,17 @@ private:
 	bool _isAlive;
 	bool _isJumpKeyUp;		
 
+	int _skillGauge;
+	int _hpCnt;
+
 	int _drowsingCntDown;
 	int _invinCntDown;		// 무적상태 : 피격당했을 때
 
 	bool _showRect;
 	
-	objectManager* _objM;
-	bulletManager* _bulletM;
+	objectManager*	_objM;
+	bulletManager*	_bulletM;
+	enemyManager*	_enemyM;
 
 	
 	
@@ -130,7 +134,10 @@ public:
 	void changeState(ePLAYER_STATE state);
 	void evaluateEvent();
 
-	void setManagerLink(objectManager* objM, bulletManager* bulletM) {_objM = objM; _bulletM = bulletM;}
+	void attackbySword();
+	void attackbyBullet();
+
+	void setManagerLink(objectManager* objM, bulletManager* bulletM, enemyManager* enemyM) {_objM = objM; _bulletM = bulletM; _enemyM = enemyM;}
 	
 	bool checkInteractionObject();
 	bool checkFloating();

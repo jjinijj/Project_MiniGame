@@ -52,8 +52,8 @@
     <Filter Include="2DFrameWork\Collision">
       <UniqueIdentifier>{ae19a185-37a4-4a56-b8f2-dfd4787815ba}</UniqueIdentifier>
     </Filter>
-    <Filter Include="PlayGround\Actor">
-      <UniqueIdentifier>{245ef388-2e61-4382-bd51-10fe6ce36c5b}</UniqueIdentifier>
+    <Filter Include="PlayGround\Enemy">
+      <UniqueIdentifier>{46b99533-5df5-48c3-8be8-340ac4c91bbb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -123,11 +123,11 @@
     <ClInclude Include="scripts\collision.h">
       <Filter>2DFrameWork\Collision</Filter>
     </ClInclude>
-    <ClInclude Include="scripts\actorManager.h">
-      <Filter>PlayGround\Actor</Filter>
+    <ClInclude Include="scripts\enemy.h">
+      <Filter>PlayGround\Enemy</Filter>
     </ClInclude>
-    <ClInclude Include="scripts\actor.h">
-      <Filter>PlayGround\Actor</Filter>
+    <ClInclude Include="scripts\enemyManager.h">
+      <Filter>PlayGround\Enemy</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -188,11 +188,11 @@
     <ClCompile Include="scripts\collision.cpp">
       <Filter>2DFrameWork\Collision</Filter>
     </ClCompile>
-    <ClCompile Include="scripts\actorManager.cpp">
-      <Filter>PlayGround\Actor</Filter>
+    <ClCompile Include="scripts\enemy.cpp">
+      <Filter>PlayGround\Enemy</Filter>
     </ClCompile>
-    <ClCompile Include="scripts\actor.cpp">
-      <Filter>PlayGround\Actor</Filter>
+    <ClCompile Include="scripts\enemyManager.cpp">
+      <Filter>PlayGround\Enemy</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

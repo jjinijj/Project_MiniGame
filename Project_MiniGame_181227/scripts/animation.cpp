@@ -67,6 +67,7 @@ void animation::play()
 	if (_frameCycle < _count)
 	{
 		_count = 0;
+		_doEvent = false;
 		++_curFrameX;
 		if (_endIdx < _curFrameX)
 		{
@@ -91,6 +92,7 @@ void animation::playReverse()
 	if (_count < 0)
 	{
 		_count = _frameCycle;
+		_doEvent = false;
 		--_curFrameX;
 		if (_curFrameX < _startIdx)
 		{

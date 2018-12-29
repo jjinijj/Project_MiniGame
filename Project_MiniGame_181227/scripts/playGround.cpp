@@ -35,13 +35,23 @@ HRESULT playGround::init()
 	IMAGEMANAGER->addFrameImage("knight_sitAnddrowse", L"image/knight_sitAnddrowse.png", 568, 266, 4, 2);
 	IMAGEMANAGER->addFrameImage("knight_walk", L"image/knight_walk.png", 852, 266, 6, 2);
 
+	IMAGEMANAGER->addFrameImage("tiktik_move", L"image/tiktik_move.png", 416, 190, 4, 2);
+	IMAGEMANAGER->addFrameImage("tiktik_climbup", L"image/tiktik_climbup.png", 416, 190, 4, 2);
+	IMAGEMANAGER->addFrameImage("tiktik_climbdown", L"image/tiktik_climbdown.png", 416, 190, 4, 2);
+	IMAGEMANAGER->addFrameImage("tiktik_dead", L"image/tiktik_dead.png", 208, 190, 2, 2);
+
+
 	_player = new player;
 	_player->init();
 
 	_objManager = new objectManager;
 	_objManager->init();
 
-	_player->setManagerLink(_objManager, nullptr);
+	_enemyManager = new enemyManager;
+	_enemyManager->init();
+
+	_player->setManagerLink(_objManager, nullptr, _enemyManager);
+	_enemyManager->setManagerLink(_objManager);
 
 	{
 		objectGround* ground = new objectGround;
@@ -55,7 +65,7 @@ HRESULT playGround::init()
 	}
 	{
 		objectGround* ground = new objectGround;
-		ground->init(800, 600, 500, 100);
+		ground->init(600, 600, 200, 100);
 		_objManager->pushBackObject(ground);
 	}
 	{
@@ -74,6 +84,10 @@ HRESULT playGround::init()
 		_objManager->pushBackObject(ground);
 	}
 
+
+	_enemyManager->setEnemys();
+
+
 	return S_OK;
 }
 
@@ -86,6 +100,9 @@ void playGround::release()
 
 	SAFE_RELEASE(_objManager);
 	SAFE_DELETE(_objManager);
+
+	SAFE_RELEASE(_enemyManager);
+	SAFE_DELETE(_enemyManager);
 }
 
 void playGround::update()
@@ -94,6 +111,7 @@ void playGround::update()
 
 	_player->update();
 	_objManager->update();
+	_enemyManager->update();
 }
 
 void playGround::render()
@@ -105,6 +123,7 @@ void playGround::render()
 	//				##		여기에 코드 작성(Start)		##
 
 	_objManager->render();
+	_enemyManager->render();
 	_player->render();
 
 	//D2DMANAGER->_renderTarget->CreateLayer()
