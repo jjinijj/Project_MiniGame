@@ -3,6 +3,7 @@
 #define PI 3.141592f
 #define PI2 2 * PI
 
+
 namespace JJINS_UTIL
 {
 	typedef struct tagRectFloat
@@ -40,23 +41,48 @@ namespace JJINS_UTIL
 		return str;
 	}
 
-	inline bool CheckIntersectRectF(RECTF& rcf1, RECTF& rcf2)
+	inline bool CheckIntersectRect(const RECT& rc1, const RECT& rc2)
 	{
-		if ( rcf2.left <= rcf1.left && rcf1.left < rcf2.right )
+		int hightL	= rc1.left	< rc2.left	? rc2.left	: rc1.left;
+		int lowR	= rc1.right < rc2.right ? rc1.right : rc2.right;
+		int highT	= rc1.top	< rc2.top	? rc2.top	: rc1.top;
+		int lowB	= rc1.bottom< rc2.bottom? rc1.bottom: rc2.bottom;
+
+		for ( int xx = hightL; xx <= lowR; ++xx )
 		{
-			if ( rcf2.bottom <= rcf1.bottom && rcf1.top < rcf2.bottom)
+			for ( int yy = highT; yy <= lowB; ++yy )
+			{
 				return true;
-			else if( rcf1.bottom <= rcf2.bottom && rcf2.top < rcf1.bottom)
-				return true;
+			}
 		}
 
 		return false;
 	}
 
-	// warrning
-	inline RECT ConvertRECTFtoRECT(RECTF rcf)
+	inline int GetIntersectOffsetX(const RECT& moveRc, const RECT& sourcRc)
 	{
-		RECT rc = {(int)rcf.left, (int)rcf.top, (int)rcf.right, (int)rcf.bottom};
-		return rc;
+		int hightL	= moveRc.left	< sourcRc.left	? sourcRc.left	: moveRc.left;
+		int lowR	= moveRc.right	< sourcRc.right ? moveRc.right	: sourcRc.right;
+
+		if(moveRc.left < hightL )
+			return hightL - moveRc.right;
+		else if(lowR < moveRc.right )
+			return lowR - moveRc.left;
+
+		return 0;
 	}
+
+	inline int GetIntersectOffsetY(const RECT& moveRc, const RECT& sourcRc)
+	{
+		int highT	= moveRc.top	< sourcRc.top	? sourcRc.top	: moveRc.top;
+		int lowB	= moveRc.bottom	< sourcRc.bottom? moveRc.bottom	: sourcRc.bottom;
+
+		if(moveRc.top < highT )
+			return highT - moveRc.bottom;
+		else if( lowB < moveRc.bottom )
+			return lowB - moveRc.top + 1;
+
+		return 0;
+	}
+
 }

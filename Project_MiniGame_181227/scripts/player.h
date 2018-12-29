@@ -84,12 +84,13 @@ private:
 	eDIRECTION _dir_UD;
 	animation* _anim;
 
-	POINTF _position;	// middle, bottom
+	POINT _position;	// middle, bottom
 	POINT _size;
-	POINTF _atkRange;
+	POINT _atkRange;
 
-	RECTF _collision;	// 플레이어 충돌체
-	RECTF _collisionAtk; // 공격 충돌체
+	RECT _collision;	// 플레이어 충돌체
+	RECT _collisionAtk; // 공격 충돌체
+	RECT _collisionBot;
 	
 	float _jumpPower;
 	float _gravity;
@@ -132,7 +133,7 @@ public:
 	void setManagerLink(objectManager* objM, bulletManager* bulletM) {_objM = objM; _bulletM = bulletM;}
 	
 	bool checkInteractionObject();
-	bool checkPlayOntheGround();
+	bool checkFloating();
 	bool isStateCheck_Attack() { return ((ePLAYER_STATE_ATTACK_1 == _state) || (ePLAYER_STATE_ATTACK_2 == _state) || (ePLAYER_STATE_ATTACK_3 == _state) ||
 										(ePLAYER_STATE_ATTACK_UP == _state) || (ePLAYER_STATE_ATTACK_DOWN == _state)); }
 	bool isMoveable()			{ return (ePLAYER_STATE_SIT != _state) && (ePLAYER_STATE_DROWSE != _state);}

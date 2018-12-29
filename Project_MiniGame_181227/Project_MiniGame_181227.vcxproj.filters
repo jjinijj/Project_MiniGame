@@ -49,6 +49,12 @@
     <Filter Include="PlayGround\Object">
       <UniqueIdentifier>{3626000a-f50b-4760-b3b7-914b9a386642}</UniqueIdentifier>
     </Filter>
+    <Filter Include="2DFrameWork\Collision">
+      <UniqueIdentifier>{ae19a185-37a4-4a56-b8f2-dfd4787815ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PlayGround\Actor">
+      <UniqueIdentifier>{245ef388-2e61-4382-bd51-10fe6ce36c5b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="scripts\randomFunction.h">
@@ -114,6 +120,15 @@
     <ClInclude Include="scripts\gameObject.h">
       <Filter>PlayGround\Object</Filter>
     </ClInclude>
+    <ClInclude Include="scripts\collision.h">
+      <Filter>2DFrameWork\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="scripts\actorManager.h">
+      <Filter>PlayGround\Actor</Filter>
+    </ClInclude>
+    <ClInclude Include="scripts\actor.h">
+      <Filter>PlayGround\Actor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="scripts\stdafx.cpp">
@@ -169,6 +184,15 @@
     </ClCompile>
     <ClCompile Include="scripts\gameObject.cpp">
       <Filter>PlayGround\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="scripts\collision.cpp">
+      <Filter>2DFrameWork\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="scripts\actorManager.cpp">
+      <Filter>PlayGround\Actor</Filter>
+    </ClCompile>
+    <ClCompile Include="scripts\actor.cpp">
+      <Filter>PlayGround\Actor</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

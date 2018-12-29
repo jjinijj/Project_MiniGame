@@ -425,14 +425,6 @@ void player::update()
 				_position.x = 0;
 				_position.y = 0;
 			}
-
-			//if ( testY < _position.y )
-			//{
-			//	_position.y = testY;
-			//	_isFloating = false;
-			//
-			//	changeState(ePLAYER_STATE_LAND);
-			//}
 		}
 		else if ( _isFloating )
 		{
@@ -507,7 +499,9 @@ void player::update()
 	updateCollision();
 	evaluateEvent();
 	
-	if (!checkPlayOntheGround())
+
+
+	if (checkFloating())
 	{
 		if (!_isFloating)
 		{
@@ -530,7 +524,7 @@ void player::render()
 {
 
 	WCHAR str[128];
-	swprintf_s(str, L"[%.2f][%.2f] [state :%d] [%.2f]", _position.x, _position.y, _state, _jumpHeight);
+	swprintf_s(str, L"[%d][%d] [state :%d] [%.2f]", _position.x, _position.y, _state, _jumpHeight);
 	D2DMANAGER->drawTextD2D(D2DMANAGER->_defaultBrush, L"나눔고딕", 15.0f
 							, str
 							, CAMERA->getPosX() + 500
@@ -636,6 +630,9 @@ void player::updateCollision()
 	}
 	else
 		_collisionAtk = {};
+
+	// 바닥
+	_collisionBot = {(int)_collision.left, ( int )_collision.bottom, ( int )_collision.right, ( int )_collision.bottom + 2};
 }
 
 void player::evaluateEvent()
@@ -676,7 +673,7 @@ bool player::checkInteractionObject()
 	return false;
 }
 
-bool player::checkPlayOntheGround()
+bool player::checkFloating()
 {
 	if(nullptr == _objM)
 		return false;
@@ -684,23 +681,57 @@ bool player::checkPlayOntheGround()
 	lObject* objList = _objM->getObjectList(eOBJECT_GROUND);
 	
 	if(objList->size() == 0)
-		return false;
+		return true;
 
+	bool isFloating = true;
+	int offsetX = 0;
+	int offsetY = 0;
+	gameObject* obj = nullptr;
+	RECT objCol = {};
 	ilObject end = objList->end();
-	for (ilObject iter = objList->begin(); end != iter; ++iter)
+
+	for ( ilObject iter = objList->begin(); end != iter; ++iter )
 	{
-		gameObject* obj = (*iter);
-		RECT temp;
-		RECT playerCol	= ConvertRECTFtoRECT(_collision);
-		RECT objCol		= (obj->getCollision());
-		RECT objColPoint= (obj->getCollisionPoint());
-		if (IntersectRect(&temp, &playerCol, &objColPoint))
+		obj		= (*iter);
+		objCol	= ( obj->getCollision() );
+
+		if( !CheckIntersectRect(_collision, objCol) )
+			continue;
+
+		offsetX = GetIntersectOffsetX(_collision, objCol);
+		offsetY = GetIntersectOffsetY(_collision, objCol);
+		
+		// 상하
+		if ( objCol.left <= _collision.left && _collision.right < objCol.right )
 		{
-			_position.y = objColPoint.top + 1;
-			return true;
+			_position.y += offsetY;
+			if ( offsetY <= 0 )
+				isFloating = false;
+		} 
+		// 좌우
+		else if ( objCol.top <= _collision.top && _collision.bottom <= objCol.bottom)
+			_position.x += offsetX;
+		// 모서리
+		else if (abs(offsetX) < abs(offsetY))
+			_position.x += offsetX;
+		// 모서리
+		else
+		{
+			// 정확히 모서리
+			if ( _collision.bottom == objCol.top )
+			{
+				if ( _collision.left == objCol.right || _collision.right == objCol.left )
+				{
+					isFloating = true;
+					continue;
+				}
+			}
+
+			_position.y += offsetY;
+			if ( offsetY <= 0 )
+				isFloating = false;
 		}
 	}
 
-	return false;
+	return isFloating;
 }
-

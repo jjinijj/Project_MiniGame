@@ -30,7 +30,6 @@ protected:
 	POINTF _position;
 	POINT _size;
 	RECT _collision;
-	RECT _collisionPoint;
 
 	eOBJECT_TYPE _type;
 	int _subType;
@@ -44,7 +43,6 @@ public:
 	void update();
 	
 	const RECT& getCollision() {return _collision;}
-	const RECT& getCollisionPoint() {return _collisionPoint;}
 	eOBJECT_TYPE getType() {return _type;}
 	int getSubType() {return _subType;}
 };
