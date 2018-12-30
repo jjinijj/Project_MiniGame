@@ -133,6 +133,7 @@
     <ClInclude Include="scripts\ImageLoader.h" />
     <ClInclude Include="scripts\imageManager.h" />
     <ClInclude Include="scripts\keyManager.h" />
+    <ClInclude Include="scripts\mawlek.h" />
     <ClInclude Include="scripts\minion.h" />
     <ClInclude Include="scripts\ObjectManager.h" />
     <ClInclude Include="scripts\player.h" />
@@ -164,6 +165,7 @@
     <ClCompile Include="scripts\ImageLoader.cpp" />
     <ClCompile Include="scripts\imageManager.cpp" />
     <ClCompile Include="scripts\keyManager.cpp" />
+    <ClCompile Include="scripts\mawlek.cpp" />
     <ClCompile Include="scripts\minion.cpp" />
     <ClCompile Include="scripts\ObjectManager.cpp" />
     <ClCompile Include="scripts\player.cpp" />

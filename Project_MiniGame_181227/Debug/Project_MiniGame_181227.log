@@ -1,7 +1,11 @@
-﻿  bulletManager.cpp
+﻿  mawlek.cpp
 c:\users\user\desktop\project_minigame\project_minigame_181227\scripts\player.h(149): warning C4244: 'return': 'LONG'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
 c:\users\user\desktop\project_minigame\project_minigame_181227\scripts\player.h(150): warning C4244: 'return': 'LONG'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\user\desktop\project_minigame\project_minigame_181227\scripts\bulletmanager.cpp(138): warning C4838: 'FLOAT'에서 'LONG'(으)로의 변환에는 축소 변환이 필요합니다.
-c:\users\user\desktop\project_minigame\project_minigame_181227\scripts\bulletmanager.cpp(137): warning C4244: '초기화 중': 'FLOAT'에서 'LONG'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-c:\users\user\desktop\project_minigame\project_minigame_181227\scripts\bulletmanager.cpp(138): warning C4244: '초기화 중': 'FLOAT'에서 'LONG'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\desktop\project_minigame\project_minigame_181227\scripts\mawlek.cpp(172): warning C4838: 'LONG'에서 'FLOAT'(으)로의 변환에는 축소 변환이 필요합니다.
+c:\users\user\desktop\project_minigame\project_minigame_181227\scripts\mawlek.cpp(172): warning C4244: '초기화 중': 'LONG'에서 'FLOAT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\desktop\project_minigame\project_minigame_181227\scripts\mawlek.cpp(323): warning C4244: '인수': 'LONG'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\desktop\project_minigame\project_minigame_181227\scripts\mawlek.cpp(325): warning C4244: '인수': 'LONG'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\desktop\project_minigame\project_minigame_181227\scripts\mawlek.cpp(327): warning C4244: '인수': 'LONG'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\desktop\project_minigame\project_minigame_181227\scripts\mawlek.cpp(332): warning C4244: '인수': 'LONG'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\user\desktop\project_minigame\project_minigame_181227\scripts\mawlek.cpp(331): warning C4244: '인수': 'LONG'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
   Project_MiniGame_181227.vcxproj -> C:\Users\USER\Desktop\Project_MiniGame\Project_MiniGame_181227\Debug\Project_MiniGame_181227.exe

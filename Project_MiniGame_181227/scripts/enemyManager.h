@@ -10,7 +10,7 @@ enum
 	ENEMY_COUNT_IN_STAGE = 5,
 
 	// 보스 등장하기 위한 적의 수
-	ENEMY_COUNT_NEED_EXIST_BOSS = 50,
+	ENEMY_COUNT_NEED_EXIST_BOSS = 10,
 
 };
 

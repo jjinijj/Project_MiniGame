@@ -147,6 +147,9 @@
     <ClInclude Include="scripts\bulletManager.h">
       <Filter>PlayGround\Bullet</Filter>
     </ClInclude>
+    <ClInclude Include="scripts\mawlek.h">
+      <Filter>PlayGround\Enemy</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="scripts\stdafx.cpp">
@@ -226,6 +229,9 @@
     </ClCompile>
     <ClCompile Include="scripts\bulletManager.cpp">
       <Filter>PlayGround\Bullet</Filter>
+    </ClCompile>
+    <ClCompile Include="scripts\mawlek.cpp">
+      <Filter>PlayGround\Enemy</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

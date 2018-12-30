@@ -4,6 +4,7 @@
 #include "tiktik.h"
 #include "gruzzer.h"
 #include "primalAspid.h"
+#include "mawlek.h"
 
 HRESULT enemyManager::init()
 {
@@ -37,8 +38,7 @@ void enemyManager::update()
 		if ( _enemyCnt < ENEMY_COUNT_NEED_EXIST_BOSS )
 		{
 			// 물렉(보스)를 제외한
-			//eENEMY_TYPE type = (eENEMY_TYPE)RND->getInt((int)eENEMY_MAWLEK);
-			eENEMY_TYPE type = (eENEMY_TYPE)RND->getInt((int)eENEMY_PRIMALASPID);
+			eENEMY_TYPE type = (eENEMY_TYPE)RND->getInt((int)eENEMY_MAWLEK);
 			createEnemy(type);
 		}
 		else if( !_isExistBoss )
@@ -89,7 +89,7 @@ void enemyManager::setEnemys()
 {
 	for ( int ii = 0; ii < 1; ++ii )
 	{
-		eENEMY_TYPE type = eENEMY_PRIMALASPID;//(eENEMY_TYPE)RND->getInt((int)eENEMY_PRIMALASPID);
+		eENEMY_TYPE type = eENEMY_MAWLEK;//(eENEMY_TYPE)RND->getInt((int)eENEMY_MAWLEK);
 		createEnemy(type);
 	}
 }
@@ -176,6 +176,18 @@ void enemyManager::createEnemy(eENEMY_TYPE type)
 		{
 			if( _isExistBoss )
 				return;
+
+			POINTF position;
+			position.x = 1000;
+			position.y = WINSIZEY - 20;
+
+			mawlek* mk = new mawlek;
+			mk->init(position, _enemyCnt);
+
+			mk->setManagerLink(_objM);
+			mk->setPlayerLink(_target);
+
+			_enemyList.push_back(mk);
 
 			_isExistBoss = true;
 			break;
