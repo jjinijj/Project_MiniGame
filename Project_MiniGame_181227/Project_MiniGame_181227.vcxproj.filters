@@ -55,6 +55,9 @@
     <Filter Include="PlayGround\Enemy">
       <UniqueIdentifier>{46b99533-5df5-48c3-8be8-340ac4c91bbb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="PlayGround\Bullet">
+      <UniqueIdentifier>{7ef795b6-9b75-45df-b353-5fe979eee0f1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="scripts\randomFunction.h">
@@ -138,6 +141,12 @@
     <ClInclude Include="scripts\primalAspid.h">
       <Filter>PlayGround\Enemy</Filter>
     </ClInclude>
+    <ClInclude Include="scripts\bullet.h">
+      <Filter>PlayGround\Bullet</Filter>
+    </ClInclude>
+    <ClInclude Include="scripts\bulletManager.h">
+      <Filter>PlayGround\Bullet</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="scripts\stdafx.cpp">
@@ -211,6 +220,12 @@
     </ClCompile>
     <ClCompile Include="scripts\primalAspid.cpp">
       <Filter>PlayGround\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="scripts\bullet.cpp">
+      <Filter>PlayGround\Bullet</Filter>
+    </ClCompile>
+    <ClCompile Include="scripts\bulletManager.cpp">
+      <Filter>PlayGround\Bullet</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

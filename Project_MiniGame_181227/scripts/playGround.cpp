@@ -51,6 +51,9 @@ HRESULT playGround::init()
 	IMAGEMANAGER->addFrameImage("primalAspid_move", L"image/primalAspid_move.png", 684, 272, 4, 2);
 	IMAGEMANAGER->addFrameImage("primalAspid_attack", L"image/primalAspid_attack.png", 684, 272, 4, 2);
 	IMAGEMANAGER->addFrameImage("primalAspid_dead", L"image/primalAspid_dead.png", 171, 272, 1, 2);
+	
+	IMAGEMANAGER->addFrameImage("bullet_fire", L"image/bullet_fire.png", 270, 30, 7, 1);
+	IMAGEMANAGER->addFrameImage("bullet_pang", L"image/bullet_pang.png", 203, 30, 3, 1);
 
 
 	_player = new player;
@@ -62,9 +65,15 @@ HRESULT playGround::init()
 	_enemyManager = new enemyManager;
 	_enemyManager->init();
 
-	_player->setManagerLink(_objManager, nullptr, _enemyManager);
-	_enemyManager->setManagerLink(_objManager);
+	_bulletManager = new bulletManager;
+	_bulletManager->init();
+
+	_player->setManagerLink(_objManager, _bulletManager, _enemyManager);
+	_enemyManager->setManagerLink(_objManager, _bulletManager);
 	_enemyManager->setPlayerLink(_player);
+	
+	_bulletManager->setLink(_player, _enemyManager, _objManager);
+	
 	_enemyManager->setEnemys();
 
 	return S_OK;
@@ -77,11 +86,11 @@ void playGround::release()
 	SAFE_RELEASE(_player);
 	SAFE_DELETE(_player);
 
-	SAFE_RELEASE(_objManager);
-	SAFE_DELETE(_objManager);
+	_objManager->release();
+	_objManager->releaseSingleton();
 
-	SAFE_RELEASE(_enemyManager);
-	SAFE_DELETE(_enemyManager);
+	_enemyManager->release();
+	_enemyManager->releaseSingleton();
 }
 
 void playGround::update()
@@ -98,6 +107,7 @@ void playGround::update()
 	_player->update();
 	_objManager->update();
 	_enemyManager->update();
+	_bulletManager->update();
 }
 
 void playGround::render()
@@ -109,6 +119,7 @@ void playGround::render()
 	//				##		여기에 코드 작성(Start)		##
 
 	_objManager->render();
+	_bulletManager->render();
 	_enemyManager->render();
 	_player->render();
 

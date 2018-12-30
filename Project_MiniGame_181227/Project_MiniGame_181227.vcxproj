@@ -119,6 +119,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="scripts\animation.h" />
+    <ClInclude Include="scripts\bullet.h" />
+    <ClInclude Include="scripts\bulletManager.h" />
     <ClInclude Include="scripts\camera.h" />
     <ClInclude Include="scripts\collision.h" />
     <ClInclude Include="scripts\d2dManager.h" />
@@ -148,6 +150,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="scripts\animation.cpp" />
+    <ClCompile Include="scripts\bullet.cpp" />
+    <ClCompile Include="scripts\bulletManager.cpp" />
     <ClCompile Include="scripts\camera.cpp" />
     <ClCompile Include="scripts\collision.cpp" />
     <ClCompile Include="scripts\d2dManager.cpp" />

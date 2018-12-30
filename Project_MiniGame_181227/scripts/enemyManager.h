@@ -20,8 +20,9 @@ typedef std::list<enemy*>::iterator			ilEnemy;
 typedef std::list<enemy*>::const_iterator	cilEnemy;
 
 class objectManager;
+class bulletManager;
 class player;
-class enemyManager : singletonBase<enemyManager>
+class enemyManager : public singletonBase<enemyManager>
 {
 private:
 
@@ -30,6 +31,7 @@ private:
 	ilEnemy	_iter;
 
 	objectManager* _objM;
+	bulletManager* _bulletM;
 	player* _target;
 
 	int _enemyCnt;
@@ -42,7 +44,7 @@ public:
 	void render();
 	void release();
 
-	void setManagerLink(objectManager* objM) {_objM = objM;}
+	void setManagerLink(objectManager* objM, bulletManager* bulletM) {_objM = objM; _bulletM = bulletM;}
 	void setPlayerLink(player* target) {_target = target;}
 
 	void setEnemys();

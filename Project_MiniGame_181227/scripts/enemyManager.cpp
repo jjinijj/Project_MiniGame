@@ -165,6 +165,8 @@ void enemyManager::createEnemy(eENEMY_TYPE type)
 
 			em->setManagerLink(_objM);
 			em->setPlayerLink(_target);
+			em->setBulletMLink(_bulletM);
+			em->setBulletImgNames("bullet_fire","bullet_pang");
 
 			_enemyList.push_back(em);
 

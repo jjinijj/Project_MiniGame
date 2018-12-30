@@ -3,8 +3,7 @@
 #include "player.h"
 #include "ObjectManager.h"
 #include "enemyManager.h"
-
-#define ENEMY_MAX 18
+#include "bulletManager.h"
 
 class playGround : public gameNode
 {
@@ -12,6 +11,7 @@ private:
 	player*			_player;
 	objectManager*	_objManager;
 	enemyManager*	_enemyManager;
+	bulletManager*	_bulletManager;
 
 	bool _isDataLoaded;
 
@@ -20,7 +20,6 @@ public:
 	virtual void release();
 	virtual void update();
 	virtual void render();
-
 
 	playGround();
 	~playGround();

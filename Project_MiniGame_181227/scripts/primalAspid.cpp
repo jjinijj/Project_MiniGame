@@ -2,6 +2,7 @@
 #include "primalAspid.h"
 #include "player.h"
 #include "ObjectManager.h"
+#include "bulletManager.h"
 
 HRESULT primalAspid::init(POINTF position, unsigned int uid)
 {
@@ -22,6 +23,7 @@ HRESULT primalAspid::init(POINTF position, unsigned int uid)
 		animation* anim = new animation;
 		image* img = IMAGEMANAGER->findImage("primalAspid_attack");
 		anim->init(img, false, 0, img->GetMaxFrameX(), 5, _dir);
+		anim->SetEventFrameX(img->GetMaxFrameX());
 		_animMap.insert(make_pair(eATTACK, anim));
 	}
 
@@ -108,6 +110,28 @@ void primalAspid::move()
 		{
 			changeState(eIDLE);
 			_state = eMOVE_FARWAY;
+		}
+		else if ( _anim->IsEventFrame() && !_anim->isDoEvent() )
+		{
+
+			if ( _bulletM )
+			{
+				_anim->SetEventFlag(true);
+				for ( int ii = 0; ii < 3; ++ii )
+				{
+					bullet* bullet = _bulletM->createBullet(eLINEARBULLET);
+					POINTF startPos;
+					float angle = _angle + (PI / 4) * (1 - ii);
+					if( eRIGHT == _dir )
+						startPos.x = _position.x + _colSize.x / 2;
+					else 
+						startPos.x = _position.x - _colSize.x / 2;
+
+					startPos.y = _position.y - _colSize.y / 2;
+
+					bullet->init(startPos, angle, _speed * 3, BULLET_SIZE, _bulletImgName, _bulletPangImgName);
+				}
+			}
 		}
 	}
 

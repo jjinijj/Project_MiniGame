@@ -148,6 +148,7 @@ public:
 	void setManagerLink(objectManager* objM, bulletManager* bulletM, enemyManager* enemyM) {_objM = objM; _bulletM = bulletM; _enemyM = enemyM;}
 	float getPositionX() {return _position.x;}
 	float getPositionY() {return _position.y;}
+	RECT getCollisionRECT() {return _collision;}
 	
 	bool checkInteractionObject();
 	bool checkIntersectEnemy();
