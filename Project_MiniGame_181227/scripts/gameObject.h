@@ -33,22 +33,25 @@ protected:
 
 	eOBJECT_TYPE _type;
 	int _subType;
+	unsigned int _uid;
 	
 public:
 	gameObject();
 	~gameObject();
 
 	HRESULT init();
+	virtual HRESULT init(float x, float y, int width, int height, unsigned int uid);
 	void render();
 	void update();
 	
 	const RECT& getCollision() {return _collision;}
 	eOBJECT_TYPE getType() {return _type;}
 	int getSubType() {return _subType;}
+	int getUid() {return _uid;}
 };
 
 class objectGround: public gameObject
 {
 public:
-	HRESULT init(float x, float y, int width, int height);
+	HRESULT init(float x, float y, int width, int height, unsigned int uid);
 };

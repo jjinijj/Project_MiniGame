@@ -85,4 +85,30 @@ namespace JJINS_UTIL
 		return 0;
 	}
 
+	inline int GetIntersectOffsetX_doNotBoard(const RECT& moveRc, const RECT& sourcRc)
+	{
+		int hightL	= moveRc.left	< sourcRc.left	? sourcRc.left	: moveRc.left;
+		int lowR	= moveRc.right	< sourcRc.right ? moveRc.right	: sourcRc.right;
+
+		if(moveRc.left < hightL )
+			return hightL - moveRc.right - 1;
+		else if(lowR < moveRc.right )
+			return lowR - moveRc.left + 1;
+
+		return 0;
+	}
+
+	inline int GetIntersectOffsetY_doNotBoard(const RECT& moveRc, const RECT& sourcRc)
+	{
+		int highT	= moveRc.top	< sourcRc.top	? sourcRc.top	: moveRc.top;
+		int lowB	= moveRc.bottom	< sourcRc.bottom? moveRc.bottom	: sourcRc.bottom;
+
+		if(moveRc.top < highT )
+			return highT - moveRc.bottom - 1;
+		else if( lowB < moveRc.bottom )
+			return lowB - moveRc.top + 1;
+
+		return 0;
+	}
+
 }

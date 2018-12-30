@@ -129,6 +129,12 @@
     <ClInclude Include="scripts\enemyManager.h">
       <Filter>PlayGround\Enemy</Filter>
     </ClInclude>
+    <ClInclude Include="scripts\tiktik.h">
+      <Filter>PlayGround\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="scripts\gruzzer.h">
+      <Filter>PlayGround\Enemy</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="scripts\stdafx.cpp">
@@ -192,6 +198,12 @@
       <Filter>PlayGround\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="scripts\enemyManager.cpp">
+      <Filter>PlayGround\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="scripts\tiktik.cpp">
+      <Filter>PlayGround\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="scripts\gruzzer.cpp">
       <Filter>PlayGround\Enemy</Filter>
     </ClCompile>
   </ItemGroup>

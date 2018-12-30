@@ -1,5 +1,8 @@
 #include "stdafx.h"
 #include "enemyManager.h"
+#include "ObjectManager.h"
+#include "tiktik.h"
+#include "gruzzer.h"
 
 HRESULT enemyManager::init()
 {
@@ -27,10 +30,33 @@ void enemyManager::update()
 			++_iter;
 		}
 	}
+
+	if ( _enemyList.size() < ENEMY_COUNT_IN_STAGE )
+	{
+		if ( _enemyCnt < ENEMY_COUNT_NEED_EXIST_BOSS )
+		{
+			// 물렉(보스)를 제외한
+			//eENEMY_TYPE type = (eENEMY_TYPE)RND->getInt((int)eENEMY_MAWLEK);
+			eENEMY_TYPE type = (eENEMY_TYPE)RND->getInt((int)eENEMY_PRIMALASPID);
+			createEnemy(type);
+		}
+		else if( !_isExistBoss )
+			createEnemy(eENEMY_MAWLEK);
+	}
 }
 
 void enemyManager::render()
 {
+	WCHAR str[128];
+	swprintf_s(str, L"[enemyCnt : %d / %d] [curEnemy : %d] ", _enemyCnt, ENEMY_COUNT_NEED_EXIST_BOSS, _enemyList.size());
+	D2DMANAGER->drawTextD2D(D2DMANAGER->_defaultBrush, L"나눔고딕", 15.0f
+							, str
+							, 10
+							, 100
+							, 500
+							, 500);
+
+
 	for ( _iter = _enemyList.begin(); _enemyList.end() != _iter; ++_iter )
 	{
 		(*_iter)->render();
@@ -60,16 +86,88 @@ void enemyManager::release()
 
 void enemyManager::setEnemys()
 {
+	for ( int ii = 0; ii < ENEMY_COUNT_IN_STAGE; ++ii )
 	{
-		enemy* em = new tiktik;
-		POINT pos = {500, 500};
-		em->setManagerLink(_objM);
-		em->init(pos, _enemyCnt);
-
-		_enemyList.push_back(em);
-
-		++_enemyCnt;
+		eENEMY_TYPE type = (eENEMY_TYPE)RND->getInt((int)eENEMY_PRIMALASPID);
+		createEnemy(type);
 	}
+}
+
+void enemyManager::createEnemy(eENEMY_TYPE type)
+{
+	bool isCreate = false;
+	switch ( type )
+	{
+		case eENEMY_TIKTIK:
+		{	
+			if(nullptr != _objM)
+			{
+				lObject* objList = _objM->getObjectList(eOBJECT_GROUND);
+
+				if ( objList->size() != 0 )
+				{
+					// 맵 테두리를 제외한 땅에서만 생성
+					int idx = RND->getFromIntTo(4, objList->size());
+
+					gameObject* obj = nullptr;
+					RECT objCol = {};
+					ilObject end = objList->end();
+
+					for ( ilObject iter = objList->begin(); end != iter, 0 <= idx; ++iter, --idx )
+					{
+						obj = ( *iter );
+						objCol = ( obj->getCollision() );
+					}
+
+					if ( obj )
+					{
+						enemy* em = new tiktik;
+						POINTF pos;
+
+						pos.x = RND->getFromIntTo(objCol.left, objCol.right);
+						pos.y = objCol.top;
+
+						em->setManagerLink(_objM);
+						em->init(pos, _enemyCnt);
+
+						_enemyList.push_back(em);
+					}
+
+					isCreate = true;
+				}
+			}
+
+			break;
+		}
+		case eENEMY_GRUZZER:
+		{
+			POINTF position;
+			position.x = RND->getFromIntTo(100, WINSIZEX - 100);
+			position.y = RND->getFromIntTo(100, WINSIZEY - 100);
+
+			enemy* em = new gruzzer;
+			em->init(position, _enemyCnt);
+
+			em->setManagerLink(_objM);
+			_enemyList.push_back(em);
+
+			break;
+		}
+		case eENEMY_PRIMALASPID:
+		{
+			break;
+		}
+		case eENEMY_MAWLEK:
+		{
+			if( _isExistBoss )
+				return;
+
+			_isExistBoss = true;
+			break;
+		}
+	}
+
+	++_enemyCnt;
 }
 
 void enemyManager::removeEnemy(int uid)

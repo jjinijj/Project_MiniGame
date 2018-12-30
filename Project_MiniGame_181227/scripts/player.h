@@ -27,10 +27,14 @@ enum
 
 	// 플레이어 무적 시간
 	PLAYER_INVINCIBILITY_TIME = 50,
+	PLAYER_PUSHED_TIME = 10,
 
 	// 플레이어 점프 파워
 	PLAYER_JUMP_POWER = 8,
 	PLAYER_GRAVITY = 2,
+	
+	// 밀리는 힘의 크기
+	PLAYER_PUSHED_POW = 2,
 
 };
 
@@ -83,6 +87,7 @@ private:
 	ePLAYER_STATE _state;
 	eDIRECTION _dir_LR;
 	eDIRECTION _dir_UD;
+	eDIRECTION _dir_pushed;
 	animation* _anim;
 
 	POINT _position;	// middle, bottom
@@ -99,13 +104,14 @@ private:
 	bool _isFloating;
 	bool _isAttack2Ready;
 	bool _isAlive;
-	bool _isJumpKeyUp;		
+	bool _isJumpKeyUp;
 
 	int _skillGauge;
 	int _hpCnt;
 
 	int _drowsingCntDown;
 	int _invinCntDown;		// 무적상태 : 피격당했을 때
+	int _pushedCntDown;		// 밀릴때
 
 	bool _showRect;
 	
@@ -134,13 +140,17 @@ public:
 	void changeState(ePLAYER_STATE state);
 	void evaluateEvent();
 
-	void attackbySword();
-	void attackbyBullet();
+	void takeDamage();
+
+	void attackUseSword();
+	void attackUseBullet();
 
 	void setManagerLink(objectManager* objM, bulletManager* bulletM, enemyManager* enemyM) {_objM = objM; _bulletM = bulletM; _enemyM = enemyM;}
 	
 	bool checkInteractionObject();
+	bool checkIntersectEnemy();
 	bool checkFloating();
+
 	bool isStateCheck_Attack() { return ((ePLAYER_STATE_ATTACK_1 == _state) || (ePLAYER_STATE_ATTACK_2 == _state) || (ePLAYER_STATE_ATTACK_3 == _state) ||
 										(ePLAYER_STATE_ATTACK_UP == _state) || (ePLAYER_STATE_ATTACK_DOWN == _state)); }
 	bool isMoveable()			{ return (ePLAYER_STATE_SIT != _state) && (ePLAYER_STATE_DROWSE != _state);}

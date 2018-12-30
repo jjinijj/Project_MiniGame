@@ -2,14 +2,17 @@
 #include "enemy.h"
 #include "ObjectManager.h"
 
-HRESULT enemy::init(POINT position, unsigned int uid)
+HRESULT enemy::init(POINTF position, unsigned int uid)
 {
-	_position = position;
+	_position.x = position.x;
+	_position.y = position.y;
 	_uid = uid;
 	_deadCnt = -1;
 	_isDead = false;
 	_isAlive = true;
 	_isAppear = true;
+
+	_dir = (eDIRECTION)RND->getInt(2);
 
 	return S_OK;
 }
@@ -23,7 +26,7 @@ void enemy::update()
 	{
 		if(_alphaCntDown == 0 )
 			_alphaCntDown = -1;
-		else
+		else if(0 < _alphaCntDown )
 			--_alphaCntDown;
 
 		move();
@@ -50,17 +53,21 @@ void enemy::release()
 void enemy::render()
 {
 	WCHAR str[128];
-	swprintf_s(str, L"hp : %d / %d", _hp, _hp);
+	swprintf_s(str, L"[hp : %d / %d] [%d] [%d] [UID : %d] ", _hp, _hp, _dir, _dirUD, _uid);
 	D2DMANAGER->drawTextD2D(D2DMANAGER->_defaultBrush, L"³ª´®°íµñ", 15.0f
 							, str
 							, _collision.left
 							, _collision.top - 50
-							, _collision.right
-							, _collision.top);
+							, _collision.right + 100
+							, _collision.bottom + 100);
 
 	D2DMANAGER->drawRectangle( D2DMANAGER->_defaultBrush
 							 , _collision.left, _collision.top
 							 , _collision.right, _collision.bottom);
+
+	D2DMANAGER->drawEllipse( D2DMANAGER->_defaultBrush
+							  , _position.x - 1, _position.y - 2
+							  , _position.x + 1, _position.y);
 
 	if ( _anim )
 	{
@@ -73,8 +80,8 @@ void enemy::render()
 
 void enemy::move()
 {
-	_collision = {   _position.x - _colSize.x / 2, _position.y - _colSize.y
-					,_position.x + _colSize.x / 2, _position.y};
+	_collision = {   (int)_position.x - _colSize.x / 2, (int)_position.y - _colSize.y
+					,(int)_position.x + _colSize.x / 2, (int)_position.y};
 }
 
 void enemy::attack()
@@ -97,6 +104,7 @@ void enemy::changeState(int state)
 
 	_state	= state;
 	_anim	= _animMap[state];
+	_anim->SetFrameY(_dir);
 	_anim->start();
 }
 
@@ -110,191 +118,6 @@ void enemy::takeDamage()
 
 void enemy::dead()
 {
-}
-
-
-HRESULT tiktik::init(POINT position, unsigned int uid)
-{
-	enemy::init(position, uid);
-	_dir = (eDIRECTION)RND->getInt(2);
-
-	{
-		animation* anim = new animation;
-		image* img = IMAGEMANAGER->findImage("tiktik_move");
-		anim->init(img, true, 0, img->GetMaxFrameX(), 10, _dir);
-		_animMap.insert(make_pair(eMOVE, anim));
-
-		_imgSize.x = img->GetFrameWidth();
-		_imgSize.y = img->GetFrameWidth();
-		_imgSizeHalf.x = img->GetFrameWidth() / 2;
-		_imgSizeHalf.y = img->GetFrameWidth() / 2;
-	}
-
-	{
-		animation* anim = new animation;
-		image* img = IMAGEMANAGER->findImage("tiktik_dead");
-		anim->init(img, false, 0, img->GetMaxFrameX(), 20, _dir);
-		_animMap.insert(make_pair(eDEAD, anim));
-	}
-
-	{
-		animation* anim = new animation;
-		image* img = IMAGEMANAGER->findImage("tiktik_climbup");
-		anim->init(img, false, 0, img->GetMaxFrameX(), 10, _dir);
-		_animMap.insert(make_pair(eCLIMBUP, anim));
-	}
-
-	{
-		animation* anim = new animation;
-		image* img = IMAGEMANAGER->findImage("tiktik_climbdown");
-		anim->init(img, false, 0, img->GetMaxFrameX(), 10, _dir);
-		_animMap.insert(make_pair(eCLIMBDOWN, anim));
-	}
-
-	{
-		animation* anim = new animation;
-		image* img = IMAGEMANAGER->findImage("tiktik_move");
-		anim->init(img, false, 0, img->GetMaxFrameX(), 10, _dir);
-		_animMap.insert(make_pair(eSIDEMOVE, anim));
-	}
-
-	{
-		animation* anim = new animation;
-		image* img = IMAGEMANAGER->findImage("tiktik_move");
-		anim->init(img, false, 0, img->GetMaxFrameX(), 10, _dir);
-		_animMap.insert(make_pair(eUNDERMOVE, anim));
-	}
-
-	_colSize = _imgSize;
-	_anim = _animMap[eMOVE];
-	_anim->start();
-	_hp = 10;
-	_speed = 1;
-
-	_collision = {   _position.x - _colSize.x / 2, _position.y - _colSize.y
-					,_position.x + _colSize.x / 2, _position.y};
-	setActiveArea();
-
-	return S_OK;
-}
-
-void tiktik::update()
-{
-	if (_isAlive)
-		move();
-}
-
-void tiktik::move()
-{
-	enemy::update();
-
-	if(nullptr == _activeArea )
-		return;
-
-	switch ( _state )
-	{
-		case eMOVE:
-		case eUNDERMOVE:
-		{
-			if ( eRIGHT == _dir )
-			{
-				_position.x += _speed;
-				if ( _activeArea->getCollision().right < _position.x )
-				{
-					changeState(eCLIMBDOWN);
-					_dirUD = eDOWN;
-				}
-			}
-			else
-			{
-				_position.x -= _speed;
-				if ( _position.x < _activeArea->getCollision().left )
-				{
-					changeState(eCLIMBDOWN);
-					_dirUD = eDOWN;
-				}
-			}
-
-			break;
-		}
-		case eSIDEMOVE:
-		{
-			if ( eDOWN == _dirUD )
-			{
-				_position.y += _speed;
-				if ( _activeArea->getCollision().bottom < _position.y )
-				{
-					changeState(eUNDERMOVE);
-					if( eRIGHT == _dir )
-						_dir = eLEFT;
-					else
-						_dir = eRIGHT;
-				}
-			}
-			else
-			{
-				_position.y -= _speed;
-				if ( _position.y < _activeArea->getCollision().top )
-				{
-					changeState(eMOVE);
-					if( eRIGHT == _dir )
-						_dir = eLEFT;
-					else
-						_dir = eRIGHT;
-				}
-			}
-			break;
-		}
-
-		case eCLIMBUP:
-		case eCLIMBDOWN:
-		{
-			if( _anim )
-				if(!_anim->IsPlayingAnimation())
-					changeState(eSIDEMOVE);
-			break;
-		}
-	}
-}
-
-void tiktik::dead()
-{
-	changeState(eDEAD);
 	_isDead = true;
 	_deadCnt = 100;
-}
-
-void tiktik::setActiveArea()
-{
-	if(nullptr == _objM )
-		return;
-
-	lObject* objList = _objM->getObjectList(eOBJECT_GROUND);
-	
-	if(objList->size() == 0)
-		return;
-
-	bool isFloating = true;
-	int offsetX = 0;
-	int offsetY = 0;
-
-	gameObject* obj = nullptr;
-	RECT objCol = {};
-	ilObject end = objList->end();
-
-	for ( ilObject iter = objList->begin(); end != iter; ++iter )
-	{
-		obj		= (*iter);
-		objCol	= ( obj->getCollision() );
-
-		if( !CheckIntersectRect(_collision, objCol) )
-			continue;
-
-		int offsetY = _collision.bottom - objCol.top;
-		_position.y -= offsetY;
-
-		_activeArea = obj;
-
-		break;
-	}
 }

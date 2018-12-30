@@ -191,6 +191,14 @@ void player::update()
 	else if(0 < _invinCntDown )
 		--_invinCntDown;
 
+	if ( _pushedCntDown == 0 )
+	{
+		_dir_pushed = eDIRECTION_NONE;
+		_pushedCntDown = -1;
+	}
+	else if(0 < _pushedCntDown )
+		--_pushedCntDown;
+
 
 	if ( _isAlive )
 	{
@@ -451,8 +459,30 @@ void player::update()
 				changeState(ePLAYER_STATE_DROWSE);
 		}
 
-	}
+		move();
+		updateCollision();
+		evaluateEvent();
 
+		if (checkFloating())
+		{
+			if (!_isFloating)
+			{
+				changeState(ePLAYER_STATE_FALLING);
+				_isFloating = true;
+			}
+		}
+		else if(_isFloating)
+		{
+			_isFloating = false;
+			changeState(ePLAYER_STATE_LAND);
+		}
+
+		if ( checkIntersectEnemy() )
+		{
+			takeDamage();
+		}
+
+	}
 
 	// ¾Ö´Ï¸ÞÀÌ¼Ç
 	if (_anim)
@@ -495,35 +525,14 @@ void player::update()
 		_anim->update();
 	}
 
-	updateCollision();
-	evaluateEvent();
-	
 
-
-	if (checkFloating())
-	{
-		if (!_isFloating)
-		{
-			changeState(ePLAYER_STATE_FALLING);
-			_isFloating = true;
-		}
-	}
-	else if(_isFloating)
-	{
-		_isFloating = false;
-		changeState(ePLAYER_STATE_LAND);
-	}
-	else
-	{
-
-	}
 }
 
 void player::render()
 {
 
 	WCHAR str[128];
-	swprintf_s(str, L"[%d][%d] [state :%d] [%.2f]", _position.x, _position.y, _state, _jumpHeight);
+	swprintf_s(str, L"[%d][%d] [state :%d] [hp : %d]", _position.x, _position.y, _state, _hpCnt);
 	D2DMANAGER->drawTextD2D(D2DMANAGER->_defaultBrush, L"³ª´®°íµñ", 15.0f
 							, str
 							, CAMERA->getPosX() + 500
@@ -572,11 +581,25 @@ void player::resetPlayer()
 
 	_gravity = (float)PLAYER_GRAVITY;
 
+	_hpCnt = 5;
 	_isAlive = true;
 }
 
 void player::move()
 {
+	if ( eDIRECTION_NONE != _dir_pushed )
+	{
+		switch ( _dir_pushed )
+		{
+			case eDIRECTION_LEFT:	{ _position.x -= PLAYER_PUSHED_POW;  break; }
+			case eDIRECTION_RIGHT:	{ _position.x += PLAYER_PUSHED_POW;  break; }
+			case eDIRECTION_UP:		{ _position.y -= PLAYER_PUSHED_POW;  break; }
+			case eDIRECTION_DOWN:	{ _position.y += PLAYER_PUSHED_POW;  break; }
+
+			default:
+				break;
+		}
+	}
 }
 
 void player::changeState(ePLAYER_STATE state)
@@ -643,14 +666,14 @@ void player::evaluateEvent()
 			case ePLAYER_STATE_ATTACK_UP:
 			case ePLAYER_STATE_ATTACK_DOWN:
 			{
-				attackbySword();
+				attackUseSword();
 				_anim->SetEventFlag(true);
 				break;
 			}
 
 			case ePLAYER_STATE_ATTACK_3:
 			{
-				attackbyBullet();
+				attackUseBullet();
 				_anim->SetEventFlag(true);
 				break;
 			}
@@ -658,7 +681,22 @@ void player::evaluateEvent()
 	}
 }
 
-void player::attackbySword()
+void player::takeDamage()
+{
+	_hpCnt -= 1;
+
+	if ( _hpCnt <= 0 )
+	{
+		_isAlive = false;
+		changeState(ePLAYER_STATE_DEAD);
+	}
+	else
+	{
+		_invinCntDown = PLAYER_INVINCIBILITY_TIME;
+	}
+}
+
+void player::attackUseSword()
 {
 	if( nullptr == _enemyM )
 		return;
@@ -675,6 +713,17 @@ void player::attackbySword()
 		RECT col = em->getCollision();
 		if( CheckIntersectRect(_collisionAtk, col) )
 		{
+			if( ePLAYER_STATE_ATTACK_1 == _state || ePLAYER_STATE_ATTACK_2 == _state )
+				_dir_pushed = (eDIRECTION)(eDIRECTION_LEFT - _dir_LR);
+			else if (ePLAYER_STATE_ATTACK_UP)
+				_dir_pushed = eDIRECTION_DOWN;
+			else if ( ePLAYER_STATE_ATTACK_DOWN )
+			{
+				_dir_pushed = eDIRECTION_UP;
+				_isFloating = true;
+			}
+
+			_pushedCntDown = PLAYER_PUSHED_TIME;
 			hitEnemyVector.push_back(em->getUid());
 		}
 	}
@@ -683,7 +732,7 @@ void player::attackbySword()
 		_enemyM->hitEnemy(*it);
 }
 
-void player::attackbyBullet()
+void player::attackUseBullet()
 {
 }
 
@@ -702,6 +751,41 @@ bool player::checkInteractionObject()
 		if (PLAYER_COL_SIZE_WIDE_HALF <= temp.right - temp.left)
 		{
 			changeState(ePLAYER_STATE_SIT);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool player::checkIntersectEnemy()
+{
+	if( nullptr == _enemyM )
+		return false;
+
+	const lEnemy& enemyList = _enemyM->getEnemyList();
+	if( 0 == enemyList.size())
+		return false;
+
+	if(0 < _invinCntDown )
+		return false;
+
+	if( !_isAlive )
+		return false;
+
+	cilEnemy end = enemyList.end();
+	for ( cilEnemy iter = enemyList.begin(); end != iter; ++iter )
+	{
+		enemy* em = *iter;
+		RECT col = em->getCollision();
+		if( CheckIntersectRect(_collision, col) )
+		{
+			if(_collision.left < col.left )
+				_dir_pushed = eDIRECTION_LEFT;
+			else 
+				_dir_pushed = eDIRECTION_RIGHT;
+
+			_pushedCntDown = 50;
 			return true;
 		}
 	}

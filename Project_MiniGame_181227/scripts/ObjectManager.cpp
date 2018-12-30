@@ -3,10 +3,24 @@
 
 void objectManager::init()
 {
-	// ¶¥ »ý¼º
+	// ¸Ê Å×µÎ¸®
 	{
-
+		createGround(MAPSIZEX / 2, 10, MAPSIZEX, 10);
+		createGround(MAPSIZEX / 2, MAPSIZEY, MAPSIZEX, 10);
+		createGround(5, MAPSIZEY, 10, MAPSIZEY);
+		createGround(MAPSIZEX - 5, MAPSIZEY, 10, MAPSIZEY);
 	}
+	//////////////////////////////////////////////////////////
+	// ºí·Ï
+	{
+		createGround(100, 600, 500, 100);
+		createGround(240, 400, 100, 100);
+		createGround(600, 600, 200, 100);
+		createGround(700, 800, 100, 100);
+		createGround(300, 800, 500, 100);
+		createGround(600, 1000, 500, 100);
+	}
+	///////////////////////////////////////////////////////////////
 }
 
 void objectManager::update()
@@ -35,6 +49,14 @@ void objectManager::release()
 	_objList.clear();
 
 	releaseSingleton();
+}
+
+void objectManager::createGround(int x, int y, int width, int height)
+{
+	objectGround* ground = new objectGround;
+	ground->init(x, y, width, height, _objCnt);
+	pushBackObject(ground);
+	++_objCnt;
 }
 
 void objectManager::pushBackObject(gameObject* gObject)

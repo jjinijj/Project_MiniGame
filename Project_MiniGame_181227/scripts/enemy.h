@@ -2,6 +2,17 @@
 #include "gameNode.h"
 #include "animation.h"
 
+enum eENEMY_TYPE
+{
+	eENEMY_TIKTIK,
+	eENEMY_GRUZZER,
+	eENEMY_PRIMALASPID,
+	eENEMY_MAWLEK,
+
+	eENEMY_NONE,
+	eENEMY_COUNT = eENEMY_NONE,
+};
+
 class objectManager;
 class gameObject;
 class enemy : public gameNode
@@ -49,7 +60,7 @@ protected:
 
 public:
 
-	virtual HRESULT init(POINT position, unsigned int uid);
+	virtual HRESULT init(POINTF position, unsigned int uid);
 	void update();
 	void release();
 	void render();
@@ -69,33 +80,3 @@ public:
 	void setManagerLink(objectManager* objM) {_objM = objM;}
 };
 
-class tiktik : public enemy
-{
-	enum eSTATE
-	{
-		eMOVE,
-		eSIDEMOVE,
-		eUNDERMOVE,
-		eCLIMBUP,
-		eCLIMBDOWN,
-		eDEAD,
-
-		eSTATE_NONE,
-		eSTATE_COUNT = eSTATE_NONE,
-	};
-
-
-private:
-	gameObject* _activeArea;
-
-public:
-
-	HRESULT init(POINT position, unsigned int uid);
-	void update();
-	void move();
-	void dead();
-
-private:
-	void setActiveArea();
-	
-};

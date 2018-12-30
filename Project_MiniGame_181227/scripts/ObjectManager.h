@@ -15,6 +15,8 @@ private:
 	lObject		_objList;
 	ilObject	_iobjList;
 
+	int _objCnt;
+
 public:
 
 	void init();
@@ -22,6 +24,7 @@ public:
 	void render();
 	void release();
 
+	void createGround(int x, int y, int width, int height);
 	void pushBackObject(gameObject* gObject);
 	lObject* getObjectList(eOBJECT_TYPE type);
 

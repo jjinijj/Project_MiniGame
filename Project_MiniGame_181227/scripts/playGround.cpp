@@ -36,9 +36,17 @@ HRESULT playGround::init()
 	IMAGEMANAGER->addFrameImage("knight_walk", L"image/knight_walk.png", 852, 266, 6, 2);
 
 	IMAGEMANAGER->addFrameImage("tiktik_move", L"image/tiktik_move.png", 416, 190, 4, 2);
-	IMAGEMANAGER->addFrameImage("tiktik_climbup", L"image/tiktik_climbup.png", 416, 190, 4, 2);
-	IMAGEMANAGER->addFrameImage("tiktik_climbdown", L"image/tiktik_climbdown.png", 416, 190, 4, 2);
+	IMAGEMANAGER->addFrameImage("tiktik_move_under", L"image/tiktik_move_under.png", 416, 190, 4, 2);
+	IMAGEMANAGER->addFrameImage("tiktik_move_sideup", L"image/tiktik_move_sideup.png", 416, 190, 4, 2);
+	IMAGEMANAGER->addFrameImage("tiktik_move_sidedown", L"image/tiktik_move_sidedown.png", 416, 190, 4, 2);
+	IMAGEMANAGER->addFrameImage("tiktik_climbup_uts", L"image/tiktik_climbup_uts.png", 416, 190, 4, 2);
+	IMAGEMANAGER->addFrameImage("tiktik_climbup_stu", L"image/tiktik_climbup_stu.png", 416, 190, 4, 2);
+	IMAGEMANAGER->addFrameImage("tiktik_climbdown_stu", L"image/tiktik_climbdown_stu.png", 416, 190, 4, 2);
+	IMAGEMANAGER->addFrameImage("tiktik_climbdown_ots", L"image/tiktik_climbdown_ots.png", 416, 190, 4, 2);
 	IMAGEMANAGER->addFrameImage("tiktik_dead", L"image/tiktik_dead.png", 208, 190, 2, 2);
+
+	IMAGEMANAGER->addFrameImage("gruzzer_move", L"image/gruzzer_move.png", 524, 218, 4, 2);
+	IMAGEMANAGER->addFrameImage("gruzzer_dead", L"image/gruzzer_dead.png", 655, 218, 5, 2);
 
 
 	_player = new player;
@@ -53,36 +61,7 @@ HRESULT playGround::init()
 	_player->setManagerLink(_objManager, nullptr, _enemyManager);
 	_enemyManager->setManagerLink(_objManager);
 
-	{
-		objectGround* ground = new objectGround;
-		ground->init(100, 600, 500, 100);
-		_objManager->pushBackObject(ground);
-	}
-	{
-		objectGround* ground = new objectGround;
-		ground->init(240, 400, 100, 100);
-		_objManager->pushBackObject(ground);
-	}
-	{
-		objectGround* ground = new objectGround;
-		ground->init(600, 600, 200, 100);
-		_objManager->pushBackObject(ground);
-	}
-	{
-		objectGround* ground = new objectGround;
-		ground->init(700, 800, 100, 100);
-		_objManager->pushBackObject(ground);
-	}
-	{
-		objectGround* ground = new objectGround;
-		ground->init(300, 800, 500, 100);
-		_objManager->pushBackObject(ground);
-	}
-	{
-		objectGround* ground = new objectGround;
-		ground->init(600, 100, 1000, 100);
-		_objManager->pushBackObject(ground);
-	}
+
 
 
 	_enemyManager->setEnemys();

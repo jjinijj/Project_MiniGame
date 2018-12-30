@@ -126,6 +126,7 @@
     <ClInclude Include="scripts\enemyManager.h" />
     <ClInclude Include="scripts\gameNode.h" />
     <ClInclude Include="scripts\gameObject.h" />
+    <ClInclude Include="scripts\gruzzer.h" />
     <ClInclude Include="scripts\image.h" />
     <ClInclude Include="scripts\ImageLoader.h" />
     <ClInclude Include="scripts\imageManager.h" />
@@ -140,6 +141,7 @@
     <ClInclude Include="scripts\singletonBase.h" />
     <ClInclude Include="scripts\stdafx.h" />
     <ClInclude Include="scripts\targetver.h" />
+    <ClInclude Include="scripts\tiktik.h" />
     <ClInclude Include="scripts\txtData.h" />
     <ClInclude Include="scripts\utils.h" />
   </ItemGroup>
@@ -152,6 +154,7 @@
     <ClCompile Include="scripts\enemyManager.cpp" />
     <ClCompile Include="scripts\gameNode.cpp" />
     <ClCompile Include="scripts\gameObject.cpp" />
+    <ClCompile Include="scripts\gruzzer.cpp" />
     <ClCompile Include="scripts\image.cpp" />
     <ClCompile Include="scripts\ImageLoader.cpp" />
     <ClCompile Include="scripts\imageManager.cpp" />
@@ -162,6 +165,7 @@
     <ClCompile Include="scripts\playGround.cpp" />
     <ClCompile Include="scripts\progressBar.cpp" />
     <ClCompile Include="scripts\stdafx.cpp" />
+    <ClCompile Include="scripts\tiktik.cpp" />
     <ClCompile Include="scripts\txtData.cpp" />
     <ClCompile Include="scripts\utils.cpp" />
     <ClCompile Include="scripts\windowsAPI.cpp" />
