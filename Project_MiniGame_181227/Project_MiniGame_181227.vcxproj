@@ -135,6 +135,7 @@
     <ClInclude Include="scripts\ObjectManager.h" />
     <ClInclude Include="scripts\player.h" />
     <ClInclude Include="scripts\playGround.h" />
+    <ClInclude Include="scripts\primalAspid.h" />
     <ClInclude Include="scripts\progressBar.h" />
     <ClInclude Include="scripts\randomFunction.h" />
     <ClInclude Include="scripts\resource.h" />
@@ -163,6 +164,7 @@
     <ClCompile Include="scripts\ObjectManager.cpp" />
     <ClCompile Include="scripts\player.cpp" />
     <ClCompile Include="scripts\playGround.cpp" />
+    <ClCompile Include="scripts\primalAspid.cpp" />
     <ClCompile Include="scripts\progressBar.cpp" />
     <ClCompile Include="scripts\stdafx.cpp" />
     <ClCompile Include="scripts\tiktik.cpp" />

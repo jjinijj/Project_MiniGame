@@ -171,37 +171,22 @@ void player::release()
 
 void player::update()
 {
-	// 테스트용
-	if(KEYMANAGER->isStayKeyDown('Q') )
-		_showRect = true;
-	else
-		_showRect = false;
-	if ( KEYMANAGER->isOnceKeyDown('W') )
-	{
-		changeState(ePLAYER_STATE_DEAD);
-		_isAlive = false;
-	}
-	if ( KEYMANAGER->isOnceKeyDown('E') )
-	{
-		//changeState(ePLAYER_STATE_HIT);
-		_invinCntDown = PLAYER_INVINCIBILITY_TIME;
-	}
-	if( _invinCntDown == 0 )
-		_invinCntDown = -1;
-	else if(0 < _invinCntDown )
-		--_invinCntDown;
-
-	if ( _pushedCntDown == 0 )
-	{
-		_dir_pushed = eDIRECTION_NONE;
-		_pushedCntDown = -1;
-	}
-	else if(0 < _pushedCntDown )
-		--_pushedCntDown;
-
-
 	if ( _isAlive )
 	{
+		if( _invinCntDown == 0 )
+			_invinCntDown = -1;
+		else if(0 < _invinCntDown )
+			--_invinCntDown;
+
+		if ( _pushedCntDown == 0 )
+		{
+			_dir_pushed = eDIRECTION_NONE;
+			_pushedCntDown = -1;
+		}
+		else if(0 < _pushedCntDown )
+			--_pushedCntDown;
+
+
 		// 이동
 		if ( !isStateCheck_Attack() )
 		{

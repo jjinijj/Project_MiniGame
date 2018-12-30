@@ -3,6 +3,7 @@
 #include "ObjectManager.h"
 #include "tiktik.h"
 #include "gruzzer.h"
+#include "primalAspid.h"
 
 HRESULT enemyManager::init()
 {
@@ -31,7 +32,7 @@ void enemyManager::update()
 		}
 	}
 
-	if ( _enemyList.size() < ENEMY_COUNT_IN_STAGE )
+	if ( _enemyList.size() < 1 )
 	{
 		if ( _enemyCnt < ENEMY_COUNT_NEED_EXIST_BOSS )
 		{
@@ -86,9 +87,9 @@ void enemyManager::release()
 
 void enemyManager::setEnemys()
 {
-	for ( int ii = 0; ii < ENEMY_COUNT_IN_STAGE; ++ii )
+	for ( int ii = 0; ii < 1; ++ii )
 	{
-		eENEMY_TYPE type = (eENEMY_TYPE)RND->getInt((int)eENEMY_PRIMALASPID);
+		eENEMY_TYPE type = eENEMY_PRIMALASPID;//(eENEMY_TYPE)RND->getInt((int)eENEMY_PRIMALASPID);
 		createEnemy(type);
 	}
 }
@@ -155,6 +156,18 @@ void enemyManager::createEnemy(eENEMY_TYPE type)
 		}
 		case eENEMY_PRIMALASPID:
 		{
+			POINTF position;
+			position.x = RND->getFromIntTo(100, WINSIZEX - 100);
+			position.y = RND->getFromIntTo(100, WINSIZEY - 100);
+
+			primalAspid* em = new primalAspid;
+			em->init(position, _enemyCnt);
+
+			em->setManagerLink(_objM);
+			em->setPlayerLink(_target);
+
+			_enemyList.push_back(em);
+
 			break;
 		}
 		case eENEMY_MAWLEK:

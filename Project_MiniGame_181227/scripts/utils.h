@@ -111,4 +111,18 @@ namespace JJINS_UTIL
 		return 0;
 	}
 
+	inline float CheckInRange(POINTF target, POINTF sour, float range)
+	{
+		float distance = pow((target.x - sour.x), 2) + pow((target.y - sour.y), 2);
+		float dis_ran = pow(range, 2);
+
+		return (distance <= dis_ran);
+	}
+
+	inline POINTF MakePointF(float x, float y)
+	{
+		POINTF pf = {x, y};
+		return pf;
+	}
+
 }

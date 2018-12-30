@@ -2,8 +2,7 @@
 #include "gruzzer.h"
 #include "ObjectManager.h"
 
-HRESULT gruzzer::
-init(POINTF position, unsigned int uid)
+HRESULT gruzzer::init(POINTF position, unsigned int uid)
 {
 	enemy::init(position, uid);
 
@@ -26,14 +25,13 @@ init(POINTF position, unsigned int uid)
 		_animMap.insert(make_pair(eDEAD, anim));
 	}
 
-	_colSize.x = _imgSize.x - 20;
-	_colSize.y = _imgSize.y - 20;
+	_colSize.x = _imgSize.x - 30;
+	_colSize.y = _imgSize.y - 30;
 	_anim = _animMap[eMOVE];
 	_anim->start();
 	_hp = 1;
 	_speed = 1;
 
-	_angle = (PI / 4) + (_dir * PI / 2);
 	_dirUD = (eDIRECTION)RND->getFromIntTo(eUP, eDIRECTION_NONE);
 	_collision = {   (int)_position.x - _colSize.x / 2, (int)_position.y - _colSize.y
 					,(int)_position.x + _colSize.x / 2, (int)_position.y};
@@ -62,7 +60,7 @@ void gruzzer::move()
 		_position.y += _speed;
 
 	_collision = {   (int)_position.x - _colSize.x / 2, (int)_position.y - _colSize.y
-		,(int)_position.x + _colSize.x / 2, (int)_position.y};
+					,(int)_position.x + _colSize.x / 2, (int)_position.y};
 
 	if(nullptr == _objM)
 		return;
@@ -95,8 +93,6 @@ void gruzzer::move()
 			_dirUD = (eDIRECTION)(eDOWN - _dirUD + eUP);
 
 			_position.y += offsetY;
-			_angle = PI2 - _angle;
-
 		} 
 		// 좌우
 		else if ( objCol.top <= _collision.top && _collision.bottom <= objCol.bottom )
@@ -104,37 +100,21 @@ void gruzzer::move()
 			_dir = (eDIRECTION)(eLEFT - _dir);
 
 			_position.x += offsetX;
-			_angle = PI - _angle;
 		}
 		// 모서리
 		else if ( abs(offsetX) < abs(offsetY) )
 		{
 			_dir = (eDIRECTION)(eLEFT - _dir);
 			_position.x += offsetX;
-			_angle = PI - _angle;
 		}
 		// 모서리
 		else
 		{
 			_dirUD = (eDIRECTION)(eDOWN - _dirUD + eUP);
 			_position.y += offsetY;
-			_angle = PI2 - _angle;
 		}
-
-		//if( PI * 0.5 < _angle && _angle < PI * 1.5 )
-		//	_dir = eLEFT;
-		//else
-		//	_dir = eRIGHT;
-
-		_anim->SetFrameY(_dir);
-		//_position.x += offsetX;
-		//_position.y += offsetY;
 	}
 
-	if( PI * 0.5 < _angle && _angle < PI * 1.5 )
-		_dir = eLEFT;
-	else
-		_dir = eRIGHT;
 	_anim->SetFrameY(_dir);
 }
 

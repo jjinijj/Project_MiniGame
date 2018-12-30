@@ -15,9 +15,6 @@ private:
 
 private:
 
-	float _angle;
-
-
 public:
 
 	HRESULT init(POINTF position, unsigned int uid);

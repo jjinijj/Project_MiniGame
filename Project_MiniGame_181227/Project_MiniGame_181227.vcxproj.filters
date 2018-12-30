@@ -135,6 +135,9 @@
     <ClInclude Include="scripts\gruzzer.h">
       <Filter>PlayGround\Enemy</Filter>
     </ClInclude>
+    <ClInclude Include="scripts\primalAspid.h">
+      <Filter>PlayGround\Enemy</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="scripts\stdafx.cpp">
@@ -204,6 +207,9 @@
       <Filter>PlayGround\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="scripts\gruzzer.cpp">
+      <Filter>PlayGround\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="scripts\primalAspid.cpp">
       <Filter>PlayGround\Enemy</Filter>
     </ClCompile>
   </ItemGroup>

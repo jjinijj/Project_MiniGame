@@ -146,6 +146,8 @@ public:
 	void attackUseBullet();
 
 	void setManagerLink(objectManager* objM, bulletManager* bulletM, enemyManager* enemyM) {_objM = objM; _bulletM = bulletM; _enemyM = enemyM;}
+	float getPositionX() {return _position.x;}
+	float getPositionY() {return _position.y;}
 	
 	bool checkInteractionObject();
 	bool checkIntersectEnemy();
