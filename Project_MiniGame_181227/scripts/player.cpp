@@ -288,8 +288,6 @@ void player::update()
 				if (isMoveable())
 				{
 					_position.x += 5;
-					if (WINSIZEX < _position.x)
-						_position.x = 0;
 				}
 
 				if (ePLAYER_STATE_WALK != _state)
@@ -411,12 +409,6 @@ void player::update()
 			_jumpPower -= _gravity;
 			if(_jumpPower < -PLAYER_JUMP_POWER)
 				_jumpPower = -(float)PLAYER_JUMP_POWER;
-
-			if (WINSIZEY < _position.y)
-			{
-				_position.x = 0;
-				_position.y = 0;
-			}
 		}
 		else if ( _isFloating )
 		{
@@ -426,12 +418,6 @@ void player::update()
 				_jumpPower -= _gravity;
 				if (_jumpPower < -PLAYER_JUMP_POWER)
 					_jumpPower = -(float)PLAYER_JUMP_POWER;
-
-				if (WINSIZEY < _position.y)
-				{
-					_position.x = 0;
-					_position.y = 0;
-				}
 			}
 		}
 
@@ -517,7 +503,7 @@ void player::render()
 {
 
 	WCHAR str[128];
-	swprintf_s(str, L"[%d][%d] [state :%d] [hp : %d]", _position.x, _position.y, _state, _hpCnt);
+	swprintf_s(str, L"[%.2f][%.2f] [state :%d] [hp : %d]", _position.x, _position.y, _state, _hpCnt);
 	D2DMANAGER->drawTextD2D(D2DMANAGER->_defaultBrush, L"나눔고딕", 15.0f
 							, str
 							, CAMERA->getPosX() + 500
@@ -527,22 +513,22 @@ void player::render()
 	//if ( _showRect )
 	{
 		D2DMANAGER->drawRectangle(D2DMANAGER->_defaultBrush
-								  , _collision.left, _collision.top
-								  , _collision.right, _collision.bottom);
+								  , (float)_collision.left,  (float)_collision.top
+								  , (float)_collision.right, (float)_collision.bottom);
 
 		D2DMANAGER->drawRectangle(D2DMANAGER->_defaultBrush
-								  , _collisionAtk.left, _collisionAtk.top
-								  , _collisionAtk.right, _collisionAtk.bottom);
+								  , (float)_collisionAtk.left,  (float)_collisionAtk.top
+								  , (float)_collisionAtk.right, (float)_collisionAtk.bottom);
 
 		D2DMANAGER->drawRectangle(D2DMANAGER->_defaultBrush
-								  , _collisionChair.left, _collisionChair.top
-								  , _collisionChair.right, _collisionChair.bottom);
+								  , (float)_collisionChair.left,  (float)_collisionChair.top
+								  , (float)_collisionChair.right, (float)_collisionChair.bottom);
 	}
 
 	if ( _anim )
 	{
 		if(0 < _invinCntDown )
-			_anim->render(_position.x - PLAYER_SIZE_WIDE_HALF, _position.y - PLAYER_SIZE_HEIGHT, 1 - (_invinCntDown % 10 * 0.1));
+			_anim->render(_position.x - PLAYER_SIZE_WIDE_HALF, _position.y - PLAYER_SIZE_HEIGHT, (float)(1 - (_invinCntDown % 10 * 0.1)));
 		else
 			_anim->render(_position.x - PLAYER_SIZE_WIDE_HALF, _position.y - PLAYER_SIZE_HEIGHT);
 	}
@@ -612,28 +598,28 @@ void player::changeState(ePLAYER_STATE state)
 void player::updateCollision()
 {
 	// 플레이어
-	_collision = {  _position.x - PLAYER_COL_SIZE_WIDE_HALF, _position.y - PLAYER_COL_SIZE_HEIGHT
-				  , _position.x + PLAYER_COL_SIZE_WIDE_HALF, _position.y};
+	_collision = {  (int)_position.x - PLAYER_COL_SIZE_WIDE_HALF, (int)_position.y - PLAYER_COL_SIZE_HEIGHT
+				  , (int)_position.x + PLAYER_COL_SIZE_WIDE_HALF, (int)_position.y};
 
 	// 공격범위
 	if ( ePLAYER_STATE_ATTACK_1 == _state || ePLAYER_STATE_ATTACK_2 == _state )
 	{
 		if ( eDIRECTION_RIGHT == _dir_LR )
-			_collisionAtk = { _collision.right, _position.y - PLAYER_COL_SIZE_HEIGHT_HALF - _atkRange.y
-							, _collision.right + _atkRange.x, _position.y - PLAYER_COL_SIZE_HEIGHT_HALF + _atkRange.y };
+			_collisionAtk = { _collision.right, (int)_position.y - PLAYER_COL_SIZE_HEIGHT_HALF - _atkRange.y
+							, _collision.right + _atkRange.x, (int)_position.y - PLAYER_COL_SIZE_HEIGHT_HALF + _atkRange.y };
 		else if ( eDIRECTION_LEFT == _dir_LR )
-			_collisionAtk = { _collision.left - _atkRange.x, _position.y - PLAYER_COL_SIZE_HEIGHT_HALF - _atkRange.y
-							, _collision.left, _position.y - PLAYER_COL_SIZE_HEIGHT_HALF + _atkRange.y };
+			_collisionAtk = { _collision.left - _atkRange.x, (int)_position.y - PLAYER_COL_SIZE_HEIGHT_HALF - _atkRange.y
+							, _collision.left, (int)_position.y - PLAYER_COL_SIZE_HEIGHT_HALF + _atkRange.y };
 	}
 	else if ( ePLAYER_STATE_ATTACK_UP == _state )
 	{
-		_collisionAtk = { _position.x - _atkRange.y, _collision.top - _atkRange.x
-						, _position.x + _atkRange.y, _collision.top };
+		_collisionAtk = { (int)_position.x - _atkRange.y, _collision.top - _atkRange.x
+						, (int)_position.x + _atkRange.y, _collision.top };
 	}
 	else if(ePLAYER_STATE_ATTACK_DOWN == _state )
 	{
-		_collisionAtk = { _position.x - _atkRange.y, _collision.bottom
-						, _position.x + _atkRange.y, _collision.bottom + _atkRange.x };
+		_collisionAtk = { (int)_position.x - _atkRange.y, _collision.bottom
+						, (int)_position.x + _atkRange.y, _collision.bottom + _atkRange.x };
 	}
 	else
 		_collisionAtk = {};
@@ -668,6 +654,9 @@ void player::evaluateEvent()
 
 void player::takeDamage()
 {
+	if(0 < _invinCntDown)
+		return;
+
 	_hpCnt -= 1;
 
 	if ( _hpCnt <= 0 )
@@ -729,7 +718,7 @@ bool player::checkInteractionObject()
 	// rectf로 교체할 것
 	RECT temp;
 	RECT col = {_collision.left, _collision.top, _collision.right, _collision.bottom};
-	RECT colChair = { _collisionChair.left, _collisionChair.top, _collisionChair.right, _collisionChair.bottom};
+	RECT colChair = { (int)_collisionChair.left, (int)_collisionChair.top, (int)_collisionChair.right, (int)_collisionChair.bottom};
 
 	if ( IntersectRect(&temp, &col, &colChair) )
 	{

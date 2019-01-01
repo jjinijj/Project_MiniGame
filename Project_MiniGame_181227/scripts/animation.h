@@ -38,6 +38,7 @@ public:
 	
 	// 렌더 : 출력할 위치 left, top, alpha
 	void render(float x, float y, float alpha = 1.f);
+	void render(int x, int y, float alpha = 1.f);
 	
 	//종료
 	void end();

@@ -77,9 +77,9 @@ HRESULT playGround::init()
 	_enemyManager->setPlayerLink(_player);
 	
 	_bulletManager->setLink(_player, _enemyManager, _objManager);
-	
-	_enemyManager->setEnemys();
 
+	CAMERA->setLinkPlayer(_player);
+	
 	return S_OK;
 }
 
@@ -123,8 +123,8 @@ void playGround::render()
 	//				##		여기에 코드 작성(Start)		##
 
 	_objManager->render();
-	_bulletManager->render();
 	_enemyManager->render();
+	_bulletManager->render();
 	_player->render();
 
 	//D2DMANAGER->_renderTarget->CreateLayer()

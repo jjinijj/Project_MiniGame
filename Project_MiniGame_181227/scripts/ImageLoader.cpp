@@ -30,7 +30,7 @@ vector<string> ImageLoader::ImageLoad( const char * loadFileName )
 
 	imgInfo = TXTDATA->textLoadPerLine(fileName.c_str(), "//");
 
-	int size = imgInfo.size();
+	int size = (int)imgInfo.size();
 	for ( int ii = 0; ii < size; ++ii )
 	{
 		char str[128] = {};

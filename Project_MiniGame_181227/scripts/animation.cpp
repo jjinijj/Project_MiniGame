@@ -113,6 +113,11 @@ void animation::render(float x, float y, float alpha)
 	_image->frameRender(x, y, _curFrameX, _frameY, alpha);
 }
 
+void animation::render(int x, int y, float alpha)
+{
+	_image->frameRender((float)x, (float)y, _curFrameX, _frameY, alpha);
+}
+
 void animation::end()
 {
 	_isPlaying = false;

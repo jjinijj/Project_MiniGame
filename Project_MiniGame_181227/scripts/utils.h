@@ -125,4 +125,16 @@ namespace JJINS_UTIL
 		return pf;
 	}
 
+	inline POINTF MakePointF(int x, int y)
+	{
+		POINTF pf = { (float)x, (float)y };
+		return pf;
+	}
+
+	inline POINTF MakePointF(LONG x, LONG y)
+	{
+		POINTF pf = { (float)x, (float)y };
+		return pf;
+	}
+
 }

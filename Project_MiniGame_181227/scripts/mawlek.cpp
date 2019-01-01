@@ -7,8 +7,6 @@ HRESULT mawlek::init(POINTF position, unsigned int uid)
 {
 	enemy::init(position, uid);
 
-
-
 	// 몸
 	{
 		animation* anim = new animation;
@@ -119,12 +117,12 @@ HRESULT mawlek::init(POINTF position, unsigned int uid)
 
 	_hp = 10;
 	_speed = 1;
+	_time = 0;
+
+	_type = eENEMY_MAWLEK;;
 
 	_dirUD = eDIRECTION_NONE;
 
-	//_colSize.x = _imgSize.x - 50;
-	//_colSize.y = _imgSize.y - 50;
-	
 	_collision = {   (int)_position.x - _colSize.x / 2, (int)_position.y - _colSize.y
 					,(int)_position.x + _colSize.x / 2, (int)_position.y};
 
@@ -135,7 +133,15 @@ void mawlek::update()
 {
 	enemy::update();
 
-	if ( eATTACK3 != _mawlekState && eDEAD != _mawlekState )
+	if (eDEAD == _mawlekState)
+	{
+		_dir = (eDIRECTION)(eLEFT - _dir);
+		_anim->SetFrameY(eBODY_ATTACK * 2 + _dir);
+		return;
+	}
+
+	// 애니메이션
+	if ( eATTACK3 != _mawlekState)
 	{
 		if(_anim_armL)
 			_anim_armL->update();
@@ -145,55 +151,54 @@ void mawlek::update()
 			_anim_head->update();
 	}
 
+	// 이동
 	move();
 
-	if ( eIDLE == _mawlekState )
+	// 다음 행동 결정 텀
+	if (_time < NEXT_STATE_TERM)
 	{
-		if(0 < _idleTime )
-			--_idleTime;
-		else
+		++_time;
+	}
+	else
+	{
+		_time = 0;
+		// 행동
+		if (eIDLE == _mawlekState)
 		{
-			_mawlekState = eMOVE;
-			changeArmState((eARMSTATE)RND->getInt(eARM_MOVE));
-			changeHeadState(eHEAD_IDLE);
+			// 행동 확률
+			int value = RND->getInt(100);
+			if (value < 50)
+				changeMawlekState(eMOVE);
+		}
+		else if (eMOVE == _mawlekState)
+		{
+			POINTF targetPos = { _target->getPositionX(), _target->getPositionY() };
+			POINTF pos = MakePointF( _position.x, _position.y );
 
-			_anim = _animMap[eBODY_MOVE];
-			_anim->start();
+			// 행동 확률
+			int value = RND->getInt(100);
 
-			_state = eBODY_MOVE;
-			_mawlekState = eMOVE;
-			_anim->SetFrameY(2 * _state + _dir);
-			_anim_head->SetFrameY(2 * _headState + _dir);
+			if (CheckInRange(pos, targetPos, ATTACK_RANGE))
+			{
+				if( value < 50)
+					changeMawlekState(eATTACK1);
+			}
+			else
+			{
+				if (value < 50)
+					changeMawlekState(eATTACK2);
+			}
+
+			// 멀리있음? 그러면 무더기로 발사
+			if (!CheckInRange(pos, targetPos, ATTACK_RANGE_FAR))
+			{
+				if (value < 50)
+					changeMawlekState(eATTACK3);
+			}
 		}
 	}
-	else if ( eMOVE == _mawlekState )
-	{
-		POINTF targetPos = {_target->getPositionX(), _target->getPositionY()};
-		POINTF pos = {_position.x, _position.y};
-		int value = RND->getInt(100);
-		
-		if ( value < 30 )
-		{
-			_mawlekState = eATTACK2;
-			changeArmState((eARMSTATE)RND->getInt(eARM_MOVE));
-			changeHeadState(eHEAD_ATTAK);
 
-		}
-		else if ( value < 80 )
-		{
-
-		}
-		else if ( CheckInRange(pos, targetPos, ATTACK_RANGE) )
-		{
-			_mawlekState = eATTACK1;
-			changeArmState(eARM_ATTACK);
-		}
-		//else if ( !CheckInRange(pos, targetPos, ATTACK_RANGE_FAR) )
-		//{
-		//	_mawlekState = eATTACK3;
-		//}
-	}
-	else if ( eATTACK1 == _mawlekState )
+	if ( eATTACK1 == _mawlekState )
 	{
 		if ( _anim_armL->IsEventFrame() && !_anim_armL->isDoEvent())
 		{
@@ -203,7 +208,6 @@ void mawlek::update()
 			{
 				_target->takeDamage();
 			}
-
 		}
 		if ( _anim_armR->IsEventFrame() && !_anim_armR->isDoEvent() )
 		{
@@ -217,82 +221,25 @@ void mawlek::update()
 
 		if ( !_anim_armL->IsPlayingAnimation() && !_anim_armR->IsPlayingAnimation() )
 		{
-			_anim = _animMap[eBODY_IDLE];
-			_anim->start();
-
-			_anim_armL = _animMap_armL[eARM_IDLE];
-			_anim_armL->start();
-			_anim_armR = _animMap_armR[eARM_IDLE];
-			_anim_armR->start();
-
-			_anim_head = _animMap_head[eHEAD_IDLE];
-			_anim_head->start();
-
-			_state = eBODY_IDLE;
-			_armState = eARM_IDLE;
-			_headState = eHEAD_IDLE;
-			_mawlekState = eIDLE;
-			_anim->SetFrameY(2 * _state + _dir);
-
-			_idleTime = 0;
+			changeMawlekState(eMOVE);
 		}
 	}
 	else if ( eATTACK2 == _mawlekState )
 	{
-		if ( _anim_head->IsEventFrame() && !_anim_head->isDoEvent() )
-		{
-			_anim_head->SetEventFlag(true);
-		}
+		
 
 		if ( !_anim_head->IsPlayingAnimation())
 		{
-			_anim = _animMap[eBODY_IDLE];
-			_anim->start();
-
-			_anim_armL = _animMap_armL[eARM_IDLE];
-			_anim_armL->start();
-			_anim_armR = _animMap_armR[eARM_IDLE];
-			_anim_armR->start();
-
-			_anim_head = _animMap_head[eHEAD_IDLE];
-			_anim_head->start();
-
-			_state = eBODY_IDLE;
-			_armState = eARM_IDLE;
-			_headState = eHEAD_IDLE;
-			_mawlekState = eIDLE;
-			_anim->SetFrameY(2 * _state + _dir);
-
-			_idleTime = 0;
+			changeMawlekState(eMOVE);
 		}
 	}
 	else if ( eATTACK3 == _mawlekState )
 	{
-		if ( _anim->IsEventFrame() && !_anim->isDoEvent() )
-		{
-			_anim->SetEventFlag(true);
-		}
+
 
 		if ( !_anim->IsPlayingAnimation())
 		{
-			_anim = _animMap[eBODY_IDLE];
-			_anim->start();
-
-			_anim_armL = _animMap_armL[eARM_IDLE];
-			_anim_armL->start();
-			_anim_armR = _animMap_armR[eARM_IDLE];
-			_anim_armR->start();
-
-			_anim_head = _animMap_head[eHEAD_IDLE];
-			_anim_head->start();
-
-			_state = eBODY_IDLE;
-			_armState = eARM_IDLE;
-			_headState = eHEAD_IDLE;
-			_mawlekState = eIDLE;
-			_anim->SetFrameY(2 * _state + _dir);
-
-			_idleTime = IDLE_TIME;
+			changeMawlekState(eIDLE);
 		}
 	}
 }
@@ -328,8 +275,8 @@ void mawlek::render()
 	}
 
 	D2DMANAGER->drawRectangle( D2DMANAGER->_defaultBrush
-							  , _collisionAtk.left, _collisionAtk.top
-							  , _collisionAtk.right, _collisionAtk.bottom);
+							  , (float)_collisionAtk.left,  (float)_collisionAtk.top
+							  , (float)_collisionAtk.right, (float)_collisionAtk.bottom);
 
 	enemy::render();
 }
@@ -337,9 +284,8 @@ void mawlek::render()
 void mawlek::dead()
 {
 	enemy::dead();
-	_anim = _animMap[eBODY_ATTACK];
-	_mawlekState = eDEAD;
-	_anim->start();
+	changeMawlekState(eDEAD);
+
 }
 
 void mawlek::move()
@@ -387,6 +333,51 @@ void mawlek::move()
 	}
 }
 
+bool mawlek::isFire()
+{
+	if (_mawlekState == eATTACK2)
+	{
+		if (_anim_head->IsEventFrame() && !_anim_head->isDoEvent())
+		{
+			return true;
+		}
+	}
+	else if (_mawlekState == eATTACK3)
+	{
+		if (_anim->IsEventFrame() && !_anim->isDoEvent())
+		{
+			return true;
+		}
+	}
+	else if (_mawlekState == eDEAD)
+	{
+		if (_anim->IsEventFrame())
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+void mawlek::bulletFire()
+{
+	if (_mawlekState == eATTACK2)
+	{
+		if (_anim_head->IsEventFrame() && !_anim_head->isDoEvent())
+		{
+			_anim_head->SetEventFlag(true);
+		}
+	}
+	else if (_mawlekState == eATTACK3)
+	{
+		if (_anim->IsEventFrame() && !_anim->isDoEvent())
+		{
+			_anim->SetEventFlag(true);
+		}
+	}
+}
+
 void mawlek::changeArmState(eARMSTATE state)
 {
 	if( _armState == state )
@@ -431,6 +422,85 @@ void mawlek::changeHeadState(eHEADSTATE state)
 	_anim_head = _animMap_head[state];
 	_anim_head->SetFrameY(_dir + state * 2);
 	_anim_head->start();
+}
+
+void mawlek::changeBodyState(eBODYSTATE state)
+{
+	if (_state == state)
+		return;
+
+	if (state < 0)
+		return;
+
+	if (_animMap.find(state) == _animMap.end())
+		return;
+
+	if (nullptr != _anim)
+		_anim->end();
+
+	_state = state;
+	_anim = _animMap[state];
+	_anim->SetFrameY(_dir + state * 2);
+	_anim->start();
+}
+
+void mawlek::changeMawlekState(eSTATE state)
+{
+	switch (state)
+	{
+		case mawlek::eIDLE:
+		{
+			changeBodyState(eBODY_IDLE);
+			changeArmState(eARM_IDLE);
+			changeHeadState(eHEAD_IDLE);
+
+			_mawlekState = eIDLE;
+
+			break;
+		}
+
+		case mawlek::eMOVE:
+		{
+			changeArmState((eARMSTATE)RND->getInt(eARM_MOVE));
+			changeHeadState(eHEAD_IDLE);
+			changeBodyState(eBODY_MOVE);
+			
+			_mawlekState = eMOVE;
+
+			break;
+		}
+
+		case mawlek::eATTACK1:
+		{
+			_mawlekState = eATTACK1;
+			changeArmState(eARM_ATTACK);
+			break;
+		}
+
+		case mawlek::eATTACK2:
+		{
+			_mawlekState = eATTACK2;
+			changeArmState((eARMSTATE)RND->getInt(eARM_MOVE));
+			changeHeadState(eHEAD_ATTAK);
+			break;
+		}
+
+		case mawlek::eATTACK3:
+		{
+			_mawlekState = eATTACK3;
+			changeBodyState(eBODY_ATTACK);
+			break;
+		}
+
+		case mawlek::eDEAD:
+		{
+			_anim = _animMap[eBODY_ATTACK];
+			_mawlekState = eDEAD;
+			_anim->start();
+			break;
+		}
+	}
+
 }
 
 void mawlek::attackSide(eDIRECTION dir)

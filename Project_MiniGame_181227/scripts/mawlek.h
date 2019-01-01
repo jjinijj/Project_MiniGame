@@ -7,9 +7,9 @@ class mawlek : public enemy
 	enum 
 	{
 		ATTACK_RANGE = 300, // 근거리 공격 범위
-		ATTACK_RANGE_FAR = 100,// 원거리 공격 범위
+		ATTACK_RANGE_FAR = 800,// 원거리 공격 범위
 
-		IDLE_TIME = 10,
+		NEXT_STATE_TERM = 50,
 	};
 
 
@@ -64,7 +64,7 @@ private:
 
 	player* _target;
 
-	int _idleTime;
+	int _time;
 
 public:
 	HRESULT init(POINTF position, unsigned int uid);
@@ -76,10 +76,16 @@ public:
 	void move();
 
 	void setPlayerLink(player* target) {_target = target;}
+	void bulletFire();
+	bool isFire();
+	bool isOnBulletFire() { return (_mawlekState == eATTACK2); }
+	POINTF getBulletFirePoint() {return MakePointF(_position.x - 35, _collision.top + 40);}
 
 private:
 	void changeArmState(eARMSTATE state);
 	void changeHeadState(eHEADSTATE state);
+	void changeBodyState(eBODYSTATE state);
+	void changeMawlekState(eSTATE state);
 
 	void attackSide(eDIRECTION dir);
 };

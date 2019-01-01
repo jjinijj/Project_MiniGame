@@ -19,6 +19,13 @@ void objectManager::init()
 		createGround(700, 800, 100, 100);
 		createGround(300, 800, 500, 100);
 		createGround(600, 1000, 500, 100);
+		
+		createGround(600, MAPSIZEY - 100, 500, 100);
+		createGround(1100, MAPSIZEY - 200, 500, 100);
+		createGround(1600, MAPSIZEY - 300, 500, 100);
+		createGround(1100, MAPSIZEY - 400, 100, 100);
+		createGround(1600, MAPSIZEY - 500, 100, 100);
+		createGround(2100, MAPSIZEY - 200, 100, 100);
 	}
 	///////////////////////////////////////////////////////////////
 }
@@ -54,7 +61,7 @@ void objectManager::release()
 void objectManager::createGround(int x, int y, int width, int height)
 {
 	objectGround* ground = new objectGround;
-	ground->init(x, y, width, height, _objCnt);
+	ground->init((float)x, (float)y, width, height, _objCnt);
 	pushBackObject(ground);
 	++_objCnt;
 }

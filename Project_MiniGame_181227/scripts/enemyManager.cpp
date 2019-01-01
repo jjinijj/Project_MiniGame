@@ -1,44 +1,64 @@
 #include "stdafx.h"
 #include "enemyManager.h"
 #include "ObjectManager.h"
+#include "bulletManager.h"
 #include "tiktik.h"
 #include "gruzzer.h"
 #include "primalAspid.h"
 #include "mawlek.h"
+#include "player.h"
 
 HRESULT enemyManager::init()
 {
+	_enemyCnt		= 0;
+	_isExistBoss	= false;
+
 	return S_OK;
 }
 
 void enemyManager::update()
 {
+	if(!checkAllLinkedFinish())
+		return;
+
+
 	for ( _iter = _enemyList.begin(); _enemyList.end() != _iter; ++_iter )
 	{
-		(*_iter)->update();
+		enemy* em = (*_iter);
+		em->update();
+		// ÃÑ¾Ë¹ß½Î
+		if (em->isFire())
+			bulletFire(em);
 	}
 
 	for ( _iter = _deadEnemyList.begin(); _deadEnemyList.end() != _iter;)
 	{
-		if ( !( *_iter )->isAppear() )
+		enemy* em = (*_iter);
+		if ( !em->isAppear() )
 		{
-			(*_iter)->release();
-			_deadEnemyList.remove(*_iter);
-			break;
+			em->release();
+			_iter = _deadEnemyList.erase(_iter);
 		}
 		else
 		{
-			(*_iter)->update();
+			em->update();
+			if (eENEMY_MAWLEK == em->getEnemyType())
+			{
+				if (em->isFire())
+					bulletFire(em);
+			}
+			
 			++_iter;
 		}
 	}
 
-	if ( _enemyList.size() < 1 )
+	if ( _enemyList.size() < ENEMY_COUNT_IN_STAGE )
 	{
-		if ( _enemyCnt < ENEMY_COUNT_NEED_EXIST_BOSS )
+		if ( _enemyCnt < 10 )
 		{
 			// ¹°·º(º¸½º)¸¦ Á¦¿ÜÇÑ
 			eENEMY_TYPE type = (eENEMY_TYPE)RND->getInt((int)eENEMY_MAWLEK);
+			//eENEMY_TYPE type = eENEMY_PRIMALASPID;
 			createEnemy(type);
 		}
 		else if( !_isExistBoss )
@@ -48,8 +68,11 @@ void enemyManager::update()
 
 void enemyManager::render()
 {
+	if (!checkAllLinkedFinish())
+		return;
+
 	WCHAR str[128];
-	swprintf_s(str, L"[enemyCnt : %d / %d] [curEnemy : %d] ", _enemyCnt, ENEMY_COUNT_NEED_EXIST_BOSS, _enemyList.size());
+	swprintf_s(str, L"[enemyCnt : %d / %d] [curEnemy : %zd] ", _enemyCnt, ENEMY_COUNT_NEED_EXIST_BOSS, _enemyList.size());
 	D2DMANAGER->drawTextD2D(D2DMANAGER->_defaultBrush, L"³ª´®°íµñ", 15.0f
 							, str
 							, 10
@@ -83,15 +106,9 @@ void enemyManager::release()
 
 	_enemyList.clear();
 	_deadEnemyList.clear();
-}
-
-void enemyManager::setEnemys()
-{
-	for ( int ii = 0; ii < 1; ++ii )
-	{
-		eENEMY_TYPE type = eENEMY_MAWLEK;//(eENEMY_TYPE)RND->getInt((int)eENEMY_MAWLEK);
-		createEnemy(type);
-	}
+	_objM		= nullptr;
+	_bulletM	= nullptr;
+	_target		= nullptr;
 }
 
 void enemyManager::createEnemy(eENEMY_TYPE type)
@@ -108,7 +125,7 @@ void enemyManager::createEnemy(eENEMY_TYPE type)
 				if ( objList->size() != 0 )
 				{
 					// ¸Ê Å×µÎ¸®¸¦ Á¦¿ÜÇÑ ¶¥¿¡¼­¸¸ »ý¼º
-					int idx = RND->getFromIntTo(4, objList->size());
+					int idx = RND->getFromIntTo(4, (int)objList->size());
 
 					gameObject* obj = nullptr;
 					RECT objCol = {};
@@ -125,8 +142,8 @@ void enemyManager::createEnemy(eENEMY_TYPE type)
 						enemy* em = new tiktik;
 						POINTF pos;
 
-						pos.x = RND->getFromIntTo(objCol.left, objCol.right);
-						pos.y = objCol.top;
+						pos.x = (float)RND->getFromIntTo(objCol.left, objCol.right);
+						pos.y = (float)objCol.top;
 
 						em->setManagerLink(_objM);
 						em->init(pos, _enemyCnt);
@@ -143,8 +160,8 @@ void enemyManager::createEnemy(eENEMY_TYPE type)
 		case eENEMY_GRUZZER:
 		{
 			POINTF position;
-			position.x = RND->getFromIntTo(100, WINSIZEX - 100);
-			position.y = RND->getFromIntTo(100, WINSIZEY - 100);
+			position.x = (float)RND->getFromIntTo(100, WINSIZEX - 100);
+			position.y = (float)RND->getFromIntTo(100, WINSIZEY - 100);
 
 			enemy* em = new gruzzer;
 			em->init(position, _enemyCnt);
@@ -157,8 +174,8 @@ void enemyManager::createEnemy(eENEMY_TYPE type)
 		case eENEMY_PRIMALASPID:
 		{
 			POINTF position;
-			position.x = RND->getFromIntTo(100, WINSIZEX - 100);
-			position.y = RND->getFromIntTo(100, WINSIZEY - 100);
+			position.x = (float)RND->getFromIntTo(100, WINSIZEX - 100);
+			position.y = (float)RND->getFromIntTo(100, WINSIZEY - 100);
 
 			primalAspid* em = new primalAspid;
 			em->init(position, _enemyCnt);
@@ -197,6 +214,110 @@ void enemyManager::createEnemy(eENEMY_TYPE type)
 	++_enemyCnt;
 }
 
+void enemyManager::bulletFire(enemy* em)
+{
+	switch (em->getEnemyType())
+	{
+		case eENEMY_TIKTIK:
+		case eENEMY_GRUZZER:
+		{
+			break;
+		}
+		case eENEMY_PRIMALASPID:
+		{
+			primalAspid* pa = dynamic_cast<primalAspid*>(em);
+			
+			if(pa)
+			{
+				pa->bulletFire();
+				POINTF startPos = pa->getBulletFirePoint();
+				float baseAngle = atan2f(_target->getPositionY() - startPos.y, _target->getPositionX() - startPos.x);
+				float angle = 0.f;
+				for (int ii = 0; ii < 3; ++ii)
+				{
+					bullet* bt = _bulletM->createBullet(eLINEARBULLET);
+					if (bt)
+					{
+						angle = baseAngle + (PI / 4) * (1 - ii);
+						bt->init(startPos, angle, 10, 20, "bullet_fire", "bullet_pang");
+					}
+				}
+			}
+
+			break;
+		}
+		case eENEMY_MAWLEK:
+		{
+			mawlek* mk = dynamic_cast<mawlek*>(em);
+			if (mk)
+			{
+				RECT rc = mk->getCollision();
+				POINTF pos = mk->getBulletFirePoint();
+
+				mk->bulletFire();
+
+				if (!mk->isAlive())
+				{
+					bullet* bt = _bulletM->createBullet(eARCBULLET);
+					if (bt)
+					{
+						arcBullet* arc = dynamic_cast<arcBullet*>(bt);
+
+						int value = RND->getFromIntTo(1, 179);
+						float angle = (PI / 180) * value;
+						value = RND->getFromIntTo(10, 30);
+
+						bt->init(pos, angle, value, 20, "bullet_fire", "bullet_pang");
+						arc->setGravity(0.7f);
+					}
+				}
+				else if (mk->isOnBulletFire())
+				{
+					bullet* bt = _bulletM->createBullet(eARCBULLET);
+					if (bt)
+					{
+						arcBullet* arc = dynamic_cast<arcBullet*>(bt);
+						float x = (float)((mk->getPosition().x - (float)_target->getPositionX()) / 2 + _target->getPositionX());
+						float y = _target->getPositionY() - 1000;
+						float angle = atan2f(pos.y - y, pos.x - x);
+
+						int value = RND->getFromIntTo(10, 15);
+						bt->init(pos, angle, value, 20, "bullet_fire", "bullet_pang");
+						arc->setGravity(0.5f);
+					}
+				}
+				else
+				{
+					for (int ii = 0; ii < 50; ++ii)
+					{
+						bullet* bt = _bulletM->createBullet(eARCBULLET);
+						if (bt)
+						{
+							arcBullet* arc = dynamic_cast<arcBullet*>(bt);
+							//float x = (float)abs(mk->getPosition().x - (float)(_target->getPositionX()) * 0.5);
+							//float y = _target->getPositionY() - 500;
+							//float angle = atan2f(y - pos.y, x - pos.x);
+							int value = RND->getFromIntTo(1, 90);
+							float angle = 0;
+							if (mk->getPosition().x < _target->getPositionX())
+								angle = (PI / 180 * (value + 90));
+							else
+								angle = (PI / 180 * value);
+
+							value = RND->getFromIntTo(10, 30);
+
+							bt->init(pos, angle, value, 20, "bullet_fire", "bullet_pang");
+							arc->setGravity(0.7f);
+						}
+					}
+				}
+
+				break;
+			}
+		}
+	}
+}
+
 void enemyManager::removeEnemy(int uid)
 {
 	for ( _iter = _enemyList.begin(); _enemyList.end() != _iter; ++_iter )
@@ -228,7 +349,7 @@ void enemyManager::hitEnemy(int uid)
 	}
 }
 
-enemy * enemyManager::findEnemy(int uid)
+enemy* enemyManager::findEnemy(int uid)
 {
 	for ( _iter = _enemyList.begin(); _enemyList.end() != _iter; ++_iter )
 	{

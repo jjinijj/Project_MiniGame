@@ -41,6 +41,7 @@ HRESULT primalAspid::init(POINTF position, unsigned int uid)
 	_hp = 3;
 	_speed = 3;
 
+	_type = eENEMY_PRIMALASPID;
 	_dirUD = eDIRECTION_NONE;
 
 	_collision = {   (int)_position.x - _colSize.x / 2, (int)_position.y - _colSize.y
@@ -111,28 +112,6 @@ void primalAspid::move()
 			changeState(eIDLE);
 			_state = eMOVE_FARWAY;
 		}
-		else if ( _anim->IsEventFrame() && !_anim->isDoEvent() )
-		{
-
-			if ( _bulletM )
-			{
-				_anim->SetEventFlag(true);
-				for ( int ii = 0; ii < 3; ++ii )
-				{
-					bullet* bullet = _bulletM->createBullet(eLINEARBULLET);
-					POINTF startPos;
-					float angle = _angle + (PI / 4) * (1 - ii);
-					if( eRIGHT == _dir )
-						startPos.x = _position.x + _colSize.x / 2;
-					else 
-						startPos.x = _position.x - _colSize.x / 2;
-
-					startPos.y = _position.y - _colSize.y / 2;
-
-					bullet->init(startPos, angle, _speed * 3, BULLET_SIZE, _bulletImgName, _bulletPangImgName);
-				}
-			}
-		}
 	}
 
 	_collision = {   (int)_position.x - _colSize.x / 2, (int)_position.y - _colSize.y
@@ -195,4 +174,41 @@ void primalAspid::dead()
 {
 	enemy::dead();
 	changeState(eDEAD);
+}
+
+bool primalAspid::isFire()
+{
+	if (eATTACK == _state)
+	{
+		if (_anim->IsEventFrame() && !_anim->isDoEvent())
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+void primalAspid::bulletFire()
+{
+	if (eATTACK == _state)
+	{
+		if (_anim->IsEventFrame() && !_anim->isDoEvent())
+		{
+			_anim->SetEventFlag(true);
+		}
+	}
+}
+
+POINTF primalAspid::getBulletFirePoint()
+{
+	POINTF pof;
+
+	if (eRIGHT == _dir)
+		pof.x = _position.x + _colSize.x / 2;
+	else
+		pof.x = _position.x - _colSize.x / 2;
+
+	pof.y = _position.y - _colSize.y / 2;
+
+	return pof;
 }

@@ -38,8 +38,8 @@ void gameObject::render()
 							, _position.y + 50);
 
 	D2DMANAGER->drawRectangle(D2DMANAGER->_defaultBrush
-							  , _collision.left, _collision.top
-							  , _collision.right, _collision.bottom);
+							  , (float)_collision.left,  (float)_collision.top
+							  , (float)_collision.right, (float)_collision.bottom);
 }
 
 void gameObject::update()

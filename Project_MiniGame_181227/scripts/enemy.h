@@ -55,6 +55,7 @@ protected:
 	POINT _colSize;
 	RECT _collision;
 
+	eENEMY_TYPE _type;
 	
 	objectManager* _objM;
 
@@ -65,6 +66,9 @@ public:
 	void release();
 	void render();
 	virtual void dead();
+	virtual bool isFire();
+	virtual void bulletFire();
+	virtual POINTF getBulletFirePoint();
 
 	void move();
 	void attack();
@@ -76,7 +80,9 @@ public:
 	bool isAlive() {return _isAlive;}
 	bool isAppear() {return _isAppear;}
 	const RECT& getCollision() {return _collision;}
+	POINTF getPosition() {return MakePointF((float)_position.x, (float)_position.y);}
 
 	void setManagerLink(objectManager* objM) {_objM = objM;}
+	eENEMY_TYPE getEnemyType() {return _type;}
 };
 

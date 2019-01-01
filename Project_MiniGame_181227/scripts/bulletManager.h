@@ -46,5 +46,5 @@ private:
 	bool checkBulletIntheField(bullet* bt);
 
 	// qø° µπ∑¡¡‹
-	void returnBulletQ(bullet* bt);
+	list<bullet*>::iterator returnBulletQ(list<bullet*>::iterator it);
 };

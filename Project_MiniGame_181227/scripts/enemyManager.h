@@ -47,10 +47,10 @@ public:
 	void setManagerLink(objectManager* objM, bulletManager* bulletM) {_objM = objM; _bulletM = bulletM;}
 	void setPlayerLink(player* target) {_target = target;}
 
-	void setEnemys();
-
-
 	void createEnemy(eENEMY_TYPE type);
+
+	//void attack(enemy* em);
+	void bulletFire(enemy* em);
 
 	void removeEnemy(int uid);
 	void hitEnemy(int uid);
@@ -58,4 +58,5 @@ public:
 
 private:
 	enemy* findEnemy(int uid);
+	bool checkAllLinkedFinish() {return (_objM  != nullptr && _bulletM != nullptr);}
 };

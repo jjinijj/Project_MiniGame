@@ -3,11 +3,14 @@
 
 #define CAMERA_SPEED 10.0f
 
+class player;
 class camera : public singletonBase<camera>
 {
 private:
 	float posX;
 	float posY;
+
+	player* _player;
 
 public:
 	camera();
@@ -25,6 +28,7 @@ public:
 	float setPosX(float x)  { posX = x; }
 	float setPosY(float y)  { posX = y; }
 
+	void setLinkPlayer(player* target) {_player = target;}
 
 };
 

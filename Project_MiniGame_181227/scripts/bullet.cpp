@@ -40,6 +40,7 @@ HRESULT bullet::init(POINTF pos, float angle, float speed, float radius, const c
 	_anim->start();
 
 	_state = eMOVE;
+	_type = eBULLET_NONE;
 
 	return S_OK;
 }
@@ -125,6 +126,7 @@ void bullet::hitSomething()
 HRESULT linearBullet::init(POINTF pos, float angle, float speed, float radius, const char* moveimgName, const char* pangimgName)
 {
 	bullet::init(pos, angle, speed, radius, moveimgName, pangimgName);
+	_type = eLINEARBULLET;
 
 	return S_OK;
 }
@@ -154,8 +156,10 @@ void linearBullet::move()
 HRESULT arcBullet::init(POINTF pos, float angle, float speed, float radius, const char* moveimgName, const char* pangimgName)
 {
 	bullet::init(pos, angle, speed, radius, moveimgName, pangimgName);
+	_type = eARCBULLET;
 
 	_startPos = pos;
+	_gravity = 0.5f;
 	return S_OK;
 }
 
@@ -163,7 +167,7 @@ void arcBullet::update()
 {
 	bullet::update();
 
-	_time += 0.01f;
+	_time += 0.5f;
 	move();
 }
 
@@ -172,8 +176,8 @@ void arcBullet::move()
 	if(eMOVE != _state )
 		return;
 
-	_position.x = _startPos.x +  cosf(_angle) * _time * 1;
-	_position.y = _startPos.y - (sinf(_angle) * _time * _speed - (_gravity * 0.5 * pow(_time, 2)));
+	_position.x = _startPos.x +  -cosf(_angle) * _time * _speed * 2;
+	_position.y = _startPos.y - (sinf(_angle) * _time *( _speed * 2 ) - (float)(_gravity * pow(_time, 2)));
 }
 
 void arcBullet::clear()

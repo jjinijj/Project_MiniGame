@@ -12,7 +12,7 @@ void bulletManager::init()
 		_arcBulletQ.push(arc);
 	}
 
-	for ( int ii = 0; ii < BULLET_COUNT; ++ii )
+	for ( int ii = 0; ii < BULLET_COUNT * 3; ++ii )
 	{
 		linearBullet* linear = new linearBullet;
 		_linearbulletQ.push(linear);
@@ -22,7 +22,7 @@ void bulletManager::init()
 void bulletManager::update()
 {
 	// 이동중인 bullet
-	for ( _iter = _bulletList.begin(); _bulletList.end() != _iter; ++_iter )
+	for ( _iter = _bulletList.begin(); _bulletList.end() != _iter;  )
 	{
 		bullet* bt = (*_iter);
 		bt->update();
@@ -32,28 +32,29 @@ void bulletManager::update()
 		{
 			bt->hitSomething();
 			_bulletPangList.push_back(bt);
-			_bulletList.remove(bt);
-
-			break;
+			_iter = _bulletList.erase(_iter);
 		}
-		else if ( !checkBulletIntheField(bt) )
+		else if ( !checkBulletIntheField(bt))
 		{
-			returnBulletQ(bt);
-			break;
+			_iter = returnBulletQ(_iter);
 		}
+		else
+			++_iter;
 	}
 
 	// 터지는 중인 bullet
-	for ( _iter = _bulletPangList.begin(); _bulletPangList.end() != _iter; ++_iter )
+	for ( _iter = _bulletPangList.begin(); _bulletPangList.end() != _iter;  )
 	{
 		bullet* bt = (*_iter);
-		if(bt->isAppear() )
+		if (bt->isAppear())
+		{
 			bt->update();
+			++_iter;
+		}
 		else
 		{
+			_iter = returnBulletQ(_iter);
 			bt->clear();
-			returnBulletQ(bt);
-			break;
 		}
 	}
 }
@@ -104,29 +105,23 @@ bullet* bulletManager::createBullet(eBULLET_TYPE type)
 	{
 		case eLINEARBULLET:
 		{
-			if( _linearbulletQ.empty() )
-				newBullet = new linearBullet;
-			else
+			if( !_linearbulletQ.empty() )
 			{
 				newBullet = _linearbulletQ.front();
 				_linearbulletQ.pop();
+				_bulletList.push_back(newBullet);
 			}
-
-			_bulletList.push_back(newBullet);
 
 			break;
 		}
 		case eARCBULLET:
 		{
-			if( _arcBulletQ.empty() )
-				newBullet = new arcBullet;
-			else
+			if( !_arcBulletQ.empty() )
 			{
 				newBullet = _arcBulletQ.front();
 				_arcBulletQ.pop();
+				_bulletList.push_back(newBullet);
 			}
-
-			_bulletList.push_back(newBullet);
 
 			break;
 		}
@@ -137,8 +132,8 @@ bullet* bulletManager::createBullet(eBULLET_TYPE type)
 
 bool bulletManager::checkHitSomething(bullet* bt)
 {
-	RECT collision = { bt->getPosition().x - bt->getRadius(), bt->getPosition().y - bt->getRadius()
-		,bt->getPosition().x + bt->getRadius(), bt->getPosition().y + bt->getRadius()};
+	RECT collision = { (int)(bt->getPosition().x - bt->getRadius()), (int)(bt->getPosition().y - bt->getRadius())
+					  ,(int)(bt->getPosition().x + bt->getRadius()), (int)(bt->getPosition().y + bt->getRadius())};
 
 	if ( nullptr != _objM )
 	{
@@ -190,8 +185,10 @@ bool bulletManager::checkBulletIntheField(bullet* bt)
 	return true;
 }
 
-void bulletManager::returnBulletQ(bullet * bt)
+list<bullet*>::iterator bulletManager::returnBulletQ(list<bullet*>::iterator it)
 {
+	bullet* bt = (*it);
+
 	// 돌려준다 bullet을 q에
 	eBULLET_TYPE type = bt->getBulletType();
 	if ( eLINEARBULLET == type )
@@ -205,5 +202,7 @@ void bulletManager::returnBulletQ(bullet * bt)
 		_arcBulletQ.push(arc);
 	}
 
-	_bulletPangList.remove(bt);
+	it = _bulletPangList.erase(it);
+
+	return it;
 }

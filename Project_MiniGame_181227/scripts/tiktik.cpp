@@ -81,6 +81,7 @@ HRESULT tiktik::init(POINTF position, unsigned int uid)
 	_hp = 2;
 	_speed = 1;
 
+	_type = eENEMY_TIKTIK;
 	_collision = {   (int)_position.x - _colSize.x / 2, (int)_position.y - _colSize.y
 					,(int)_position.x + _colSize.x / 2, (int)_position.y};
 	setActiveArea();

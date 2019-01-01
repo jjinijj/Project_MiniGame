@@ -32,6 +32,8 @@ HRESULT gruzzer::init(POINTF position, unsigned int uid)
 	_hp = 1;
 	_speed = 1;
 
+	_type = eENEMY_GRUZZER;
+
 	_dirUD = (eDIRECTION)RND->getFromIntTo(eUP, eDIRECTION_NONE);
 	_collision = {   (int)_position.x - _colSize.x / 2, (int)_position.y - _colSize.y
 					,(int)_position.x + _colSize.x / 2, (int)_position.y};

@@ -69,7 +69,9 @@ private:
 	float _time;
 	float _gravity;
 
+public:
 	HRESULT init(POINTF pos, float angle, float speed, float radius, const char* moveimgName, const char* pangimgName);
+	void setGravity(float gravity) {_gravity = gravity;}
 	void update();
 	void move();
 	void clear();

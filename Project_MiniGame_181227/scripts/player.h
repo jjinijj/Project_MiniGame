@@ -90,7 +90,7 @@ private:
 	eDIRECTION _dir_pushed;
 	animation* _anim;
 
-	POINT _position;	// middle, bottom
+	POINTF _position;	// middle, bottom
 	POINT _size;
 	POINT _atkRange;
 

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "camera.h"
+#include "player.h"
 
 
 camera::camera()
@@ -30,6 +31,22 @@ void camera::release()
 
 void camera::update()
 {
+	if (_player)
+	{
+		posX = _player->getPositionX() - WINSIZEX / 2;
+		posY = _player->getPositionY() - WINSIZEX / 2;
+
+		if(posX < 0)
+			posX = 0;
+		if(posY < 0)
+			posY = 0;
+
+		if( MAPSIZEX < posX + WINSIZEX )
+			posX = MAPSIZEX - WINSIZEX;
+		if (MAPSIZEY < posY + WINSIZEY )
+			posY = MAPSIZEY - WINSIZEY;
+	}
+
 	move();
 }
 

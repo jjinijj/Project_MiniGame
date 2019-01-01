@@ -4,8 +4,8 @@
 
 HRESULT enemy::init(POINTF position, unsigned int uid)
 {
-	_position.x = position.x;
-	_position.y = position.y;
+	_position.x = (int)position.x;
+	_position.y = (int)position.y;
 	_uid = uid;
 	_deadCnt = -1;
 	_isDead = false;
@@ -56,23 +56,23 @@ void enemy::render()
 	swprintf_s(str, L"[hp : %d / %d] [%d] [%d] [UID : %d] ", _hp, _hp, _dir, _dirUD, _uid);
 	D2DMANAGER->drawTextD2D(D2DMANAGER->_defaultBrush, L"³ª´®°íµñ", 15.0f
 							, str
-							, _collision.left
-							, _collision.top - 50
-							, _collision.right + 100
-							, _collision.bottom + 100);
+							, (float)_collision.left
+							, (float)_collision.top - 50
+							, (float)_collision.right + 100
+							, (float)_collision.bottom + 100);
 
 	D2DMANAGER->drawRectangle( D2DMANAGER->_defaultBrush
-							 , _collision.left, _collision.top
-							 , _collision.right, _collision.bottom);
+							 , (float)_collision.left,  (float)_collision.top
+							 , (float)_collision.right, (float)_collision.bottom);
 
 	D2DMANAGER->drawEllipse( D2DMANAGER->_defaultBrush
-							  , _position.x - 1, _position.y - 2
-							  , _position.x + 1, _position.y);
+							  , (float)_position.x - 1, (float)_position.y - 2
+							  , (float)_position.x + 1, (float)_position.y);
 
 	if ( _anim )
 	{
 		if(0 < _alphaCntDown )
-			_anim->render(_position.x - _imgSizeHalf.x, _position.y - _imgSize.y, 1.f - (_alphaCntDown % 10 * 0.1));
+			_anim->render(_position.x - _imgSizeHalf.x, _position.y - _imgSize.y, (float)(1.f - (_alphaCntDown % 10 * 0.1)));
 		else
 			_anim->render(_position.x - _imgSizeHalf.x, _position.y - _imgSize.y);
 	}
@@ -120,4 +120,18 @@ void enemy::dead()
 {
 	_isDead = true;
 	_deadCnt = 100;
+}
+
+bool enemy::isFire()
+{
+	return false;
+}
+
+void enemy::bulletFire()
+{
+}
+
+POINTF enemy::getBulletFirePoint()
+{
+	return POINTF();
 }

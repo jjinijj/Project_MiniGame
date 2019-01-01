@@ -69,8 +69,8 @@ void gameNode::render()
 
 LRESULT gameNode::MainProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam)
 {
-	PAINTSTRUCT ps;		//조사 한 번 해바밤바1
-	HDC			hdc;	//조사 한 번 해바밤바2
+	//PAINTSTRUCT ps;		//조사 한 번 해바밤바1
+	//HDC			hdc;	//조사 한 번 해바밤바2
 
 	switch (iMessage)
 	{

@@ -42,6 +42,9 @@ public:
 	void update();
 	void move();
 	void dead();
+	bool isFire();
+	void bulletFire();
+	POINTF getBulletFirePoint();
 
 	void setBulletImgNames(const char* fireImgName, const char* pangImgName) {_bulletImgName = fireImgName; _bulletPangImgName = pangImgName;}
 	void setPlayerLink(player* target) {_target = target;}
