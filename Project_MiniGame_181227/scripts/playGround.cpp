@@ -35,6 +35,7 @@ HRESULT playGround::init()
 	IMAGEMANAGER->addFrameImage("knight_sitAnddrowse", L"image/knight_sitAnddrowse.png", 568, 266, 4, 2);
 	IMAGEMANAGER->addFrameImage("knight_walk", L"image/knight_walk.png", 852, 266, 6, 2);
 
+	// enemy tiktik
 	IMAGEMANAGER->addFrameImage("tiktik_move", L"image/tiktik_move.png", 416, 190, 4, 2);
 	IMAGEMANAGER->addFrameImage("tiktik_move_under", L"image/tiktik_move_under.png", 416, 190, 4, 2);
 	IMAGEMANAGER->addFrameImage("tiktik_move_sideup", L"image/tiktik_move_sideup.png", 416, 190, 4, 2);
@@ -45,20 +46,29 @@ HRESULT playGround::init()
 	IMAGEMANAGER->addFrameImage("tiktik_climbdown_ots", L"image/tiktik_climbdown_ots.png", 416, 190, 4, 2);
 	IMAGEMANAGER->addFrameImage("tiktik_dead", L"image/tiktik_dead.png", 208, 190, 2, 2);
 
+	// enemy gruzze
 	IMAGEMANAGER->addFrameImage("gruzzer_move", L"image/gruzzer_move.png", 524, 218, 4, 2);
 	IMAGEMANAGER->addFrameImage("gruzzer_dead", L"image/gruzzer_dead.png", 655, 218, 5, 2);
 
+	// enemy pribalAspid
 	IMAGEMANAGER->addFrameImage("primalAspid_move", L"image/primalAspid_move.png", 684, 272, 4, 2);
 	IMAGEMANAGER->addFrameImage("primalAspid_attack", L"image/primalAspid_attack.png", 684, 272, 4, 2);
 	IMAGEMANAGER->addFrameImage("primalAspid_dead", L"image/primalAspid_dead.png", 171, 272, 1, 2);
 	
+	// enemy bullet
 	IMAGEMANAGER->addFrameImage("bullet_fire", L"image/bullet_fire.png", 270, 30, 7, 1);
 	IMAGEMANAGER->addFrameImage("bullet_pang", L"image/bullet_pang.png", 203, 30, 3, 1);
 	
+	// enemy boos mawlek
 	IMAGEMANAGER->addFrameImage("mawlek_body", L"image/mawlek_body.png", 3476, 1884, 11, 6);
 	IMAGEMANAGER->addFrameImage("mawlek_head", L"image/mawlek_head.png", 417, 428, 3, 4);
 	IMAGEMANAGER->addFrameImage("mawlek_arms", L"image/mawlek_arms.png", 872, 1683, 4, 6);
 
+	// floor
+	IMAGEMANAGER->addImage("floor", L"image/floor.png", 326, 34);
+	
+	// block
+	IMAGEMANAGER->addImage("block", L"image/block.png", 390, 73);
 
 	_player = new player;
 	_player->init();

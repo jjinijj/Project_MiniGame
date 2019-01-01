@@ -24,7 +24,8 @@ public:
 	void render();
 	void release();
 
-	void createGround(int x, int y, int width, int height);
+	void createGround(int x, int y, int width, const char* imgName);
+	void createGround(int x, int y, int width, int height, const char* imgName);
 	void pushBackObject(gameObject* gObject);
 	lObject* getObjectList(eOBJECT_TYPE type);
 

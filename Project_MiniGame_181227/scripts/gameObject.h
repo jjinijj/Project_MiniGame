@@ -1,6 +1,7 @@
 #pragma once
 #include "gameNode.h"
 #include "image.h"
+#include <list>
 
 enum eOBJECT_TYPE
 {
@@ -26,7 +27,12 @@ enum eCHARM_TYPE
 class gameObject : public gameNode
 {
 protected:
-	image* _img;
+
+	image* _image;
+
+	list<image*>::iterator _iter;
+	list<image*>::iterator _iter_end;
+
 	POINTF _position;
 	POINT _size;
 	RECT _collision;
@@ -34,13 +40,16 @@ protected:
 	eOBJECT_TYPE _type;
 	int _subType;
 	unsigned int _uid;
-	
+
+	int _loopCnt;
+	int _offcut;
+
 public:
 	gameObject();
 	~gameObject();
 
 	HRESULT init();
-	virtual HRESULT init(float x, float y, int width, int height, unsigned int uid);
+	virtual HRESULT init(float x, float y, int width, unsigned int uid, const char* imgName);
 	void render();
 	void update();
 	
@@ -53,5 +62,7 @@ public:
 class objectGround: public gameObject
 {
 public:
-	HRESULT init(float x, float y, int width, int height, unsigned int uid);
+	// pivot x, y : Áß½Éx, bottom y
+	HRESULT init(float x, float y, int width, unsigned int uid, const char* imgName);
+	HRESULT init(float x, float y, int width, int height, unsigned int uid, const char* imgName);
 };
