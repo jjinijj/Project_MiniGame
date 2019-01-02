@@ -224,9 +224,10 @@ void player::update()
 				{
 					changeState(ePLAYER_STATE_SIT);
 				}
-				else if ( checkInteractionObject() )
+				else if ( checkInteractionObject(eOBJECT_CHAIR) )
 				{
-
+					
+					
 				}
 				else if ( ePLAYER_STATE_IDLE == _state )
 				{
@@ -433,6 +434,7 @@ void player::update()
 		move();
 		updateCollision();
 		evaluateEvent();
+		checkInteractionObject(eOBJECT_COIN);
 
 		if (checkFloating())
 		{
@@ -520,9 +522,9 @@ void player::render()
 								  , (float)_collisionAtk.left,  (float)_collisionAtk.top
 								  , (float)_collisionAtk.right, (float)_collisionAtk.bottom);
 
-		D2DMANAGER->drawRectangle(D2DMANAGER->_defaultBrush
-								  , (float)_collisionChair.left,  (float)_collisionChair.top
-								  , (float)_collisionChair.right, (float)_collisionChair.bottom);
+		//D2DMANAGER->drawRectangle(D2DMANAGER->_defaultBrush
+		//						  , (float)_collisionChair.left,  (float)_collisionChair.top
+		//						  , (float)_collisionChair.right, (float)_collisionChair.bottom);
 	}
 
 	if ( _anim )
@@ -537,7 +539,7 @@ void player::render()
 
 void player::resetPlayer()
 {
-	_collisionChair = { 500, 400, 700, 500 };
+	//_collisionChair = { 500, 400, 700, 500 };
 
 	_dir_LR = eDIRECTION_RIGHT;
 
@@ -670,40 +672,86 @@ void player::takeDamage()
 	}
 }
 
+void player::changeCoin(int value)
+{
+	_coin += value;
+}
+
 void player::attackUseSword()
 {
-	if( nullptr == _enemyM )
-		return;
-
-	const lEnemy& enemyList = _enemyM->getEnemyList();
-	if( 0 == enemyList.size())
-		return;
-
-	list<int> hitEnemyVector;
-	cilEnemy end = enemyList.end();
-	for ( cilEnemy iter = enemyList.begin(); end != iter; ++iter )
+		//  적 공격
 	{
-		enemy* em = *iter;
-		RECT col = em->getCollision();
-		if( CheckIntersectRect(_collisionAtk, col) )
-		{
-			if( ePLAYER_STATE_ATTACK_1 == _state || ePLAYER_STATE_ATTACK_2 == _state )
-				_dir_pushed = (eDIRECTION)(eDIRECTION_LEFT - _dir_LR);
-			else if (ePLAYER_STATE_ATTACK_UP)
-				_dir_pushed = eDIRECTION_DOWN;
-			else if ( ePLAYER_STATE_ATTACK_DOWN )
-			{
-				_dir_pushed = eDIRECTION_UP;
-				_isFloating = true;
-			}
+		if (nullptr == _enemyM)
+			return;
 
-			_pushedCntDown = PLAYER_PUSHED_TIME;
-			hitEnemyVector.push_back(em->getUid());
+		const lEnemy& enemyList = _enemyM->getEnemyList();
+		if (0 == enemyList.size())
+			return;
+
+		list<int> hitEnemyVector;
+		cilEnemy end = enemyList.end();
+		for (cilEnemy iter = enemyList.begin(); end != iter; ++iter)
+		{
+			enemy* em = *iter;
+			RECT col = em->getCollision();
+			if (CheckIntersectRect(_collisionAtk, col))
+			{
+				if (ePLAYER_STATE_ATTACK_1 == _state || ePLAYER_STATE_ATTACK_2 == _state)
+					_dir_pushed = (eDIRECTION)(eDIRECTION_LEFT - _dir_LR);
+				else if (ePLAYER_STATE_ATTACK_UP)
+					_dir_pushed = eDIRECTION_DOWN;
+				else if (ePLAYER_STATE_ATTACK_DOWN)
+				{
+					_dir_pushed = eDIRECTION_UP;
+					_isFloating = true;
+				}
+
+				_pushedCntDown = PLAYER_PUSHED_TIME;
+				hitEnemyVector.push_back(em->getUid());
+			}
 		}
+
+		for (list<int>::iterator it = hitEnemyVector.begin(); hitEnemyVector.end() != it; ++it)
+			_enemyM->hitEnemy(*it);
 	}
 
-	for( list<int>::iterator it = hitEnemyVector.begin(); hitEnemyVector.end() != it; ++it )
-		_enemyM->hitEnemy(*it);
+
+
+	// 오브젝트 공격
+	{
+		if (nullptr == _objM)
+			return;
+
+		const lObject& objList = *_objM->getObjectList(eOBJECT_GOLDROCK);
+		if (0 == objList.size())
+			return;
+
+		list<int> hitObjList;
+		cilObject end = objList.end();
+		for (cilObject iter = objList.begin(); end != iter; ++iter)
+		{
+			gameObject* obj = *iter;
+			RECT col = obj->getCollision();
+			if (CheckIntersectRect(_collisionAtk, col))
+			{
+				if (ePLAYER_STATE_ATTACK_1 == _state || ePLAYER_STATE_ATTACK_2 == _state)
+					_dir_pushed = (eDIRECTION)(eDIRECTION_LEFT - _dir_LR);
+				else if (ePLAYER_STATE_ATTACK_UP)
+					_dir_pushed = eDIRECTION_DOWN;
+				else if (ePLAYER_STATE_ATTACK_DOWN)
+				{
+					_dir_pushed = eDIRECTION_UP;
+					_isFloating = true;
+				}
+
+				_pushedCntDown = PLAYER_PUSHED_TIME;
+				hitObjList.push_back(obj->getUid());
+			}
+		}
+
+		for (list<int>::iterator it = hitObjList.begin(); hitObjList.end() != it; ++it)
+			_objM->hitGameObject(*it);
+	}
 }
 
 void player::attackUseBullet()
@@ -712,24 +760,63 @@ void player::attackUseBullet()
 
 
 
-bool player::checkInteractionObject()
+bool player::checkInteractionObject(int type)
 {
-	// 임시 구현
-	// rectf로 교체할 것
-	RECT temp;
-	RECT col = {_collision.left, _collision.top, _collision.right, _collision.bottom};
-	RECT colChair = { (int)_collisionChair.left, (int)_collisionChair.top, (int)_collisionChair.right, (int)_collisionChair.bottom};
-
-	if ( IntersectRect(&temp, &col, &colChair) )
+	gameObject* obj = findInteractionObject(type);
+	if (obj)
 	{
-		if (PLAYER_COL_SIZE_WIDE_HALF <= temp.right - temp.left)
+		switch ((eOBJECT_TYPE)type)
 		{
-			changeState(ePLAYER_STATE_SIT);
-			return true;
+			case eOBJECT_CHAIR:
+			{
+				changeState(ePLAYER_STATE_SIT);
+				_position.x = obj->getPosition().x;
+				_position.y = obj->getPosition().y - 20;
+				break;
+			}
+			case eOBJECT_COIN:
+			{
+				_objM->intersectObject(obj->getUid());
+				break;
+			}
+			case eOBJECT_CHARM:
+			{
+				break;
+			}
 		}
+
+		return true;
 	}
 
 	return false;
+}
+
+gameObject* player::findInteractionObject(int type)
+{
+	// 임시 구현
+	// rectf로 교체할 것
+	if (nullptr == _objM)
+		return nullptr;
+
+	const lObject& objList = *_objM->getObjectList((eOBJECT_TYPE)type);
+
+	if (objList.size() == 0)
+		return nullptr;
+
+	gameObject* obj = nullptr;
+	RECT objCol = {};
+	cilObject end = objList.end();
+
+	for (cilObject iter = objList.begin(); end != iter; ++iter)
+	{
+		obj = (*iter);
+		objCol = (obj->getCollision());
+
+		if (CheckIntersectRect(_collision, objCol))
+			return obj;
+	}
+
+	return nullptr;
 }
 
 bool player::checkIntersectEnemy()
@@ -769,12 +856,14 @@ bool player::checkIntersectEnemy()
 
 bool player::checkFloating()
 {
+	if(_state == ePLAYER_STATE_SIT || _state == ePLAYER_STATE_DROWSE)
+		return false;
 	if(nullptr == _objM)
 		return false;
 
-	lObject* objList = _objM->getObjectList(eOBJECT_GROUND);
+	const lObject& objList = *_objM->getObjectList(eOBJECT_GROUND);
 	
-	if(objList->size() == 0)
+	if(objList.size() == 0)
 		return true;
 
 	bool isFloating = true;
@@ -782,9 +871,9 @@ bool player::checkFloating()
 	int offsetY = 0;
 	gameObject* obj = nullptr;
 	RECT objCol = {};
-	ilObject end = objList->end();
+	cilObject end = objList.end();
 
-	for ( ilObject iter = objList->begin(); end != iter; ++iter )
+	for (cilObject iter = objList.begin(); end != iter; ++iter )
 	{
 		obj		= (*iter);
 		objCol	= ( obj->getCollision() );

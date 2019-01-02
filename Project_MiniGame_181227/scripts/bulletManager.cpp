@@ -25,36 +25,34 @@ void bulletManager::update()
 	for ( _iter = _bulletList.begin(); _bulletList.end() != _iter;  )
 	{
 		bullet* bt = (*_iter);
-		bt->update();
-
+		
+		// 터지는 중인 bullet
+		if (bt->isPang())
+		{
+			if (bt->isAppear())
+			{
+				bt->update();
+				++_iter;
+			}
+			else
+			{
+				_iter = returnBulletQ(_iter);
+				bt->clear();
+			}
+		}
 		// 충돌하면 bulletPangList로
-		if ( checkHitSomething(bt) )
+		else if ( checkHitSomething(bt) )
 		{
 			bt->hitSomething();
-			_bulletPangList.push_back(bt);
-			_iter = _bulletList.erase(_iter);
 		}
 		else if ( !checkBulletIntheField(bt))
 		{
 			_iter = returnBulletQ(_iter);
 		}
 		else
-			++_iter;
-	}
-
-	// 터지는 중인 bullet
-	for ( _iter = _bulletPangList.begin(); _bulletPangList.end() != _iter;  )
-	{
-		bullet* bt = (*_iter);
-		if (bt->isAppear())
 		{
 			bt->update();
 			++_iter;
-		}
-		else
-		{
-			_iter = returnBulletQ(_iter);
-			bt->clear();
 		}
 	}
 }
@@ -65,18 +63,16 @@ void bulletManager::render()
 	{
 		(*_iter)->render();
 	}
-
-	for ( _iter = _bulletPangList.begin(); _bulletPangList.end() != _iter; ++_iter )
-	{
-		(*_iter)->render();
-	}
 }
 
 void bulletManager::release()
 {
 	for ( _iter = _bulletList.begin(); _bulletList.end() != _iter; ++_iter )
 	{
-		(*_iter)->release();
+		bullet* bul = *_iter;
+
+		SAFE_RELEASE(bul);
+		SAFE_DELETE(bul);
 	}
 
 	while ( !_arcBulletQ.empty() )
@@ -84,15 +80,17 @@ void bulletManager::release()
 		arcBullet* arc = _arcBulletQ.front();
 		_arcBulletQ.pop();
 
-		arc->release();
+		SAFE_RELEASE(arc);
+		SAFE_DELETE(arc);
 	}
 
 	while ( !_linearbulletQ.empty() )
 	{
 		linearBullet* linear = _linearbulletQ.front();
 		_linearbulletQ.pop();
-
-		linear->release();
+		
+		SAFE_RELEASE(linear);
+		SAFE_DELETE(linear);
 	}
 
 	_bulletList.clear();
@@ -194,15 +192,17 @@ list<bullet*>::iterator bulletManager::returnBulletQ(list<bullet*>::iterator it)
 	if ( eLINEARBULLET == type )
 	{
 		linearBullet* linear = dynamic_cast<linearBullet*>(bt);
-		_linearbulletQ.push(linear);
+		if(linear)
+			_linearbulletQ.push(linear);
 	}
 	else if ( eARCBULLET == type )
 	{
 		arcBullet* arc = dynamic_cast<arcBullet*>(bt);
-		_arcBulletQ.push(arc);
+		if(arc)
+			_arcBulletQ.push(arc);
 	}
 
-	it = _bulletPangList.erase(it);
+	it = _bulletList.erase(it);
 
 	return it;
 }

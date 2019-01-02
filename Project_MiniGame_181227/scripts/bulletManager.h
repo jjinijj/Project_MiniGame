@@ -20,7 +20,6 @@ private:
 	queue<linearBullet*> _linearbulletQ;	// 직선 bullet pool
 	
 	list<bullet*> _bulletList;				// 현재 사용중인 bullets
-	list<bullet*> _bulletPangList;			// 파괴(animation)중인 bullets
 	list<bullet*>::iterator _iter;			// iterator
 
 	player* _player;

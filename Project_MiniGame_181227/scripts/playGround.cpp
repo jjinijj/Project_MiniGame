@@ -67,14 +67,28 @@ HRESULT playGround::init()
 	// floor
 	IMAGEMANAGER->addImage("floor", L"image/floor.png", 326, 34);
 	
+	// wall
+	IMAGEMANAGER->addImage("wall_L", L"image/wall_L.png", 105, 169);
+	IMAGEMANAGER->addImage("wall_R", L"image/wall_R.png", 105, 169);
+
 	// block
 	IMAGEMANAGER->addImage("block", L"image/block.png", 390, 73);
+	
+	// chair
+	IMAGEMANAGER->addImage("chair", L"image/chair.png", 185, 92);
+
+	// gold Rock
+	IMAGEMANAGER->addFrameImage("goldRock", L"image/goldRock.png", 749, 109, 7, 1);
+
+	// coin
+	IMAGEMANAGER->addFrameImage("coin", L"image/coin.png", 104, 28, 4, 1);
 
 	_player = new player;
 	_player->init();
 
 	_objManager = new objectManager;
 	_objManager->init();
+	_objManager->setLinkPlayer(_player);
 
 	_enemyManager = new enemyManager;
 	_enemyManager->init();

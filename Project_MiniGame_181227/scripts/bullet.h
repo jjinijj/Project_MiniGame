@@ -51,6 +51,7 @@ public:
 	POINTF getPosition()		{ return _position;}
 	float getRadius()			{ return _radius;}
 	bool isAppear()				{ return _isAppear;}
+	bool isPang()				{ return ePANG == _state;}
 	eBULLET_TYPE getBulletType(){ return _type;}
 };
 

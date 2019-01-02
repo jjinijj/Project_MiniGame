@@ -79,6 +79,7 @@ enum eDIRECTION
 class objectManager;
 class bulletManager;
 class enemyManager;
+class gameObject;
 class player: public gameNode
 {
 private:
@@ -108,6 +109,7 @@ private:
 
 	int _skillGauge;
 	int _hpCnt;
+	int _coin;
 
 	int _drowsingCntDown;
 	int _invinCntDown;		// 무적상태 : 피격당했을 때
@@ -141,6 +143,7 @@ public:
 	void evaluateEvent();
 
 	void takeDamage();
+	void changeCoin(int value);
 
 	void attackUseSword();
 	void attackUseBullet();
@@ -149,15 +152,17 @@ public:
 	float getPositionX() {return _position.x;}
 	float getPositionY() {return _position.y;}
 	RECT getCollisionRECT() {return _collision;}
+	int getCoin() {return _coin; }
 	
-	bool checkInteractionObject();
+	bool checkInteractionObject(int type);
+	gameObject* findInteractionObject(int type);
 	bool checkIntersectEnemy();
 	bool checkFloating();
 
-	bool isStateCheck_Attack() { return ((ePLAYER_STATE_ATTACK_1 == _state) || (ePLAYER_STATE_ATTACK_2 == _state) || (ePLAYER_STATE_ATTACK_3 == _state) ||
+	bool isStateCheck_Attack()  { return ((ePLAYER_STATE_ATTACK_1 == _state) || (ePLAYER_STATE_ATTACK_2 == _state) || (ePLAYER_STATE_ATTACK_3 == _state) ||
 										(ePLAYER_STATE_ATTACK_UP == _state) || (ePLAYER_STATE_ATTACK_DOWN == _state)); }
 	bool isMoveable()			{ return (ePLAYER_STATE_SIT != _state) && (ePLAYER_STATE_DROWSE != _state);}
-	bool isStateFloating()		{return  _isFloating; }
+	bool isStateFloating()		{ return  _isFloating; }
 
 
 
