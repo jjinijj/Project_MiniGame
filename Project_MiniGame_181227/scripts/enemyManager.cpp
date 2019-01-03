@@ -71,14 +71,17 @@ void enemyManager::render()
 	if (!checkAllLinkedFinish())
 		return;
 
-	WCHAR str[128];
-	swprintf_s(str, L"[enemyCnt : %d / %d] [curEnemy : %zd] ", _enemyCnt, ENEMY_COUNT_NEED_EXIST_BOSS, _enemyList.size());
-	D2DMANAGER->drawTextD2D(D2DMANAGER->_defaultBrush, L"³ª´®°íµñ", 15.0f
-							, str
-							, 10
-							, 100
-							, 500
-							, 500);
+	if ( _isDebugMode )
+	{
+		WCHAR str[128];
+		swprintf_s(str, L"[enemyCnt : %d / %d] [curEnemy : %zd] ", _enemyCnt, ENEMY_COUNT_NEED_EXIST_BOSS, _enemyList.size());
+		D2DMANAGER->drawTextD2D(D2DMANAGER->_defaultBrush, L"³ª´®°íµñ", 15.0f
+								, str
+								, CAMERA->getPosX() + 10
+								, CAMERA->getPosY() + 170
+								, CAMERA->getPosX() + 500
+								, CAMERA->getPosY() + 1000);
+	}
 
 
 	for ( _iter = _enemyList.begin(); _enemyList.end() != _iter; ++_iter )
@@ -125,7 +128,7 @@ void enemyManager::createEnemy(eENEMY_TYPE type)
 				if ( objList->size() != 0 )
 				{
 					// ¸Ê Å×µÎ¸®¸¦ Á¦¿ÜÇÑ ¶¥¿¡¼­¸¸ »ý¼º
-					int idx = RND->getFromIntTo(4, (int)objList->size());
+					int idx = RND->getInt(objList->size() - 8);
 
 					gameObject* obj = nullptr;
 					RECT objCol = {};
@@ -160,8 +163,8 @@ void enemyManager::createEnemy(eENEMY_TYPE type)
 		case eENEMY_GRUZZER:
 		{
 			POINTF position;
-			position.x = (float)RND->getFromIntTo(100, WINSIZEX - 100);
-			position.y = (float)RND->getFromIntTo(100, WINSIZEY - 100);
+			position.x = (float)RND->getFromIntTo(100, MAPSIZEX - 100);
+			position.y = (float)RND->getFromIntTo(100, MAPSIZEY - 100);
 
 			enemy* em = new gruzzer;
 			em->init(position, _enemyCnt);
@@ -174,8 +177,8 @@ void enemyManager::createEnemy(eENEMY_TYPE type)
 		case eENEMY_PRIMALASPID:
 		{
 			POINTF position;
-			position.x = (float)RND->getFromIntTo(100, WINSIZEX - 100);
-			position.y = (float)RND->getFromIntTo(100, WINSIZEY - 100);
+			position.x = (float)RND->getFromIntTo(100, MAPSIZEX - 100);
+			position.y = (float)RND->getFromIntTo(100, MAPSIZEY - 100);
 
 			primalAspid* em = new primalAspid;
 			em->init(position, _enemyCnt);
@@ -196,7 +199,7 @@ void enemyManager::createEnemy(eENEMY_TYPE type)
 
 			POINTF position;
 			position.x = 1000;
-			position.y = WINSIZEY - 20;
+			position.y = 684;
 
 			mawlek* mk = new mawlek;
 			mk->init(position, _enemyCnt);
@@ -346,6 +349,13 @@ void enemyManager::hitEnemy(int uid)
 		em->dead();
 		_deadEnemyList.push_back(em);
 		_enemyList.remove(em);
+
+		int value = RND->getFromIntTo(1, 5);
+		POINTF pos = em->getPosition();
+		for (int ii = 0; ii < value; ++ii)
+		{
+			_objM->createGameObject(pos.x, pos.y, eOBJECT_COIN);
+		}
 	}
 }
 

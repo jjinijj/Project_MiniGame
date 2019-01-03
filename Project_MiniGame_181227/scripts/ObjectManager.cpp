@@ -4,45 +4,84 @@
 
 void objectManager::init()
 {
-	// 벽
-	{
-		createGround(5, MAPSIZEY, -1, MAPSIZEY, "wall_L");
-		createGround(MAPSIZEX - 5, MAPSIZEY, -1, MAPSIZEY, "wall_R");
-	}
-	// 바닥
-	{
-		createGround(MAPSIZEX / 2, 10, MAPSIZEX, -1, "floor");
-		createGround(MAPSIZEX / 2, MAPSIZEY, MAPSIZEX, -1, "floor");
-	}
+
+
 	//////////////////////////////////////////////////////////
 	// 블록
 	{
-		createGround(100, 600, "block");
-		createGround(240, 400, "block");
-		createGround(600, 600, "block");
-		createGround(700, 800, "block");
-		createGround(300, 800, "block");
-		createGround(600, 1000, 500, -1, "block");
+		//0
+		createGround(1220, 115, "block");
+		createGround(450, 188, 780, -1, "block");
+		createGround(300, 400, "block");
+		createGround(600, 620, "block");
+		createGround(100, 850, "block");
+		createGround(350, 1050, 250, -1, "block");
+		createGround(1350, 1050, "block");
+		createGround(660, 1250, "block_big");
+		createGround(1620, 1300, "block");
+		createGround(1405, 1428, 100, -1, "block");
+		createGround(610, 1630, 300, -1, "block");
 		
-		createGround(600, MAPSIZEY - 100, 500, -1, "block");
-		createGround(1100, MAPSIZEY - 200, 500, -1, "block");
-		createGround(1600, MAPSIZEY - 300, 500, -1, "block");
-		createGround(1100, MAPSIZEY - 400, 100, -1, "block");
-		createGround(1600, MAPSIZEY - 500, 100, -1, "block");
-		createGround(2100, MAPSIZEY - 200, 100, -1, "block");
+		// 11
+		createGround(1100, 1630, "block");
+		createGround(800, 1850, "block");
+		createGround(610, 2250, "block");
+		createGround(1100, 2050, "block");
+		createGround(900, 2450, "block");
+		createGround(500, 2650, "block");
+		createGround(1000, 2850, 780, -1, "block");
+		createGround(660, 3050, "block_big");
+		createGround(100, 3150, "block");
+		createGround(400, 3380, 200, -1, "block");
+		
+		// 21
+		createGround(700, 3500, "block");
+		createGround(1400, 3380, 200, -1, "block");
+		createGround(1600, 3150, "block");
 	}
 	///////////////////////////////////////////////////////////////
 	// 의자
 	{
-		createGameObject(500, 530, eOBJECT_CHAIR);
+		createGameObject(1100, 3050 - 90, eOBJECT_CHAIR);
+		createGameObject(100, 1430 - 90, eOBJECT_CHAIR);
 	}
 
 	/////////////////////////////////////////////////////////////
 	// 돈 바위
 	{
 		createGameObject(180, 730, eOBJECT_GOLDROCK);
-		createGameObject(180, MAPSIZEY - 100, eOBJECT_GOLDROCK);
+		createGameObject(1800, MAPSIZEY - 124, eOBJECT_GOLDROCK);
 	}
+
+	/////////////////////////////////////////////////////////////
+	// npc
+	{
+		createGameObject(900, 10, eOBJECT_NPC);
+	}
+
+	//////////////////////////////////////////////////////////////
+	// 바닥, 천장
+	{
+		// 0
+		createGround(0, -10, MAPSIZEX, -1, "floor_stone");
+		createGround(0, MAPSIZEY - 20, MAPSIZEX, -1, "floor_stone");
+		createGround(570, 685, (MAPSIZEX - 500), -1, "floor");
+		createGround(0, 685, "floor");
+	}
+
+	// 절벽
+	{
+		createGround(0, 1430, "cliff_L");
+		createGround(1487, 1750, "cliff_R");
+		createGround(0, 2150, "cliff_L");
+	}
+
+	// 벽
+	{
+		createGround(-20, 0, -1, MAPSIZEY, "wall_L");
+		createGround(MAPSIZEX - 85, 0, -1, MAPSIZEY, "wall_R");
+	}
+	// 8
 }
 
 void objectManager::update()
@@ -65,9 +104,10 @@ void objectManager::render()
 
 void objectManager::release()
 {
-	for (_iter = _objList.begin(); _objList.end() != _iter; ++_iter)
+	for (_iter = _objList.begin(); _objList.end() != _iter;)
 	{
 		(*_iter)->release();
+		_iter = _objList.erase(_iter);
 	}
 
 	_objList.clear();
@@ -123,6 +163,14 @@ void objectManager::createGameObject(int x, int y, eOBJECT_TYPE type)
 			obj->init(x, y, _objCnt, "goldRock");
 			break;
 		}
+
+		case eOBJECT_NPC:
+		{
+			obj = new objectNPC;
+			obj->init(x, y, _objCnt, "npc");
+			break;
+			
+		}
 	}
 
 	if (obj)
@@ -168,6 +216,11 @@ void objectManager::hitGameObject(int uid)
 						createGameObject(pos.x, pos.y, eOBJECT_COIN);
 				}
 
+				break;
+			}
+
+			case eOBJECT_NPC:
+			{
 				break;
 			}
 

@@ -2,6 +2,9 @@
 #include "player.h"
 #include "ObjectManager.h"
 #include "enemyManager.h"
+#include "UIManager.h"
+#include "bulletManager.h"
+
 
 player::player()
 {
@@ -10,7 +13,6 @@ player::player()
 player::~player()
 {
 }
-
 
 
 HRESULT player::init()
@@ -226,8 +228,7 @@ void player::update()
 				}
 				else if ( checkInteractionObject(eOBJECT_CHAIR) )
 				{
-					
-					
+					saveData();
 				}
 				else if ( ePLAYER_STATE_IDLE == _state )
 				{
@@ -269,8 +270,6 @@ void player::update()
 				if (isMoveable())
 				{
 					_position.x -= 5;
-					if(_position.x < 0)
-						_position.x = 0;
 				}
 
 				if (ePLAYER_STATE_WALK != _state)
@@ -370,10 +369,13 @@ void player::update()
 		if (KEYMANAGER->isOnceKeyDown('A'))
 		{
 			// 조건체크
-			//if()
+			if(0 <= _skillGauge)
 			{
-				changeState(ePLAYER_STATE_ATTACK_3);
-				//todo : 스킬게이지 소모
+				if (_bulletM->checkPlayerBullet())
+				{
+					changeState(ePLAYER_STATE_ATTACK_3);
+					_skillGauge -= 0;
+				}
 			}
 		}
 
@@ -503,17 +505,16 @@ void player::update()
 
 void player::render()
 {
-
-	WCHAR str[128];
-	swprintf_s(str, L"[%.2f][%.2f] [state :%d] [hp : %d]", _position.x, _position.y, _state, _hpCnt);
-	D2DMANAGER->drawTextD2D(D2DMANAGER->_defaultBrush, L"나눔고딕", 15.0f
-							, str
-							, CAMERA->getPosX() + 500
-							, CAMERA->getPosY()
-							, CAMERA->getPosX() + 300
-							, CAMERA->getPosY() + 100);
-	//if ( _showRect )
+	if ( _isDebugMode )
 	{
+		WCHAR str[128];
+		swprintf_s(str, L"[%.2f][%.2f] [state :%d] [hp : %d]", _position.x, _position.y, _state, _hpCnt);
+		D2DMANAGER->drawTextD2D(D2DMANAGER->_defaultBrush, L"나눔고딕", 15.0f
+								, str
+								, _position.x - 100
+								, _position.y - 150
+								, _position.x + 300
+								, _position.y + 100);
 		D2DMANAGER->drawRectangle(D2DMANAGER->_defaultBrush
 								  , (float)_collision.left,  (float)_collision.top
 								  , (float)_collision.right, (float)_collision.bottom);
@@ -544,7 +545,7 @@ void player::resetPlayer()
 	_dir_LR = eDIRECTION_RIGHT;
 
 	_position.x = 100;
-	_position.y = 500;
+	_position.y = MAPSIZEY - 100;
 
 	_size = { PLAYER_SIZE_WIDE, PLAYER_SIZE_HEIGHT };
 	_atkRange = { 100, 25 };
@@ -554,10 +555,29 @@ void player::resetPlayer()
 
 	_gravity = (float)PLAYER_GRAVITY;
 
-	_hpCnt = 5;
+	_hpCnt = _maxHp = 5;
 	_isAlive = true;
-}
 
+	_skillGaugeMax = 10;
+	_skillGauge = 0;
+
+	_pushedCntDown = 0;
+	_invinCntDown = 0;
+	_drowsingCntDown = 0;
+
+	if (_uiM)
+	{
+		_uiM->setHpMaxCount(_hpCnt);
+		_uiM->setHpCurCount(_hpCnt);
+	}
+
+	if (_uiM)
+	{
+		_uiM->setSkillGauge(_skillGauge, _skillGaugeMax);
+	}
+
+	loadData();
+}
 void player::move()
 {
 	if ( eDIRECTION_NONE != _dir_pushed )
@@ -659,6 +679,7 @@ void player::takeDamage()
 	if(0 < _invinCntDown)
 		return;
 
+	_uiM->loseHp();
 	_hpCnt -= 1;
 
 	if ( _hpCnt <= 0 )
@@ -675,6 +696,9 @@ void player::takeDamage()
 void player::changeCoin(int value)
 {
 	_coin += value;
+
+	if(_uiM)
+		_uiM->setCoin(_coin);
 }
 
 void player::attackUseSword()
@@ -712,7 +736,14 @@ void player::attackUseSword()
 		}
 
 		for (list<int>::iterator it = hitEnemyVector.begin(); hitEnemyVector.end() != it; ++it)
+		{
 			_enemyM->hitEnemy(*it);
+			++_skillGauge;
+			if(_skillGaugeMax < _skillGauge)
+				_skillGauge = _skillGaugeMax;
+
+			_uiM->setSkillGauge(_skillGauge, _skillGaugeMax);
+		}
 	}
 
 
@@ -752,10 +783,72 @@ void player::attackUseSword()
 		for (list<int>::iterator it = hitObjList.begin(); hitObjList.end() != it; ++it)
 			_objM->hitGameObject(*it);
 	}
+
+	// npc 공격 -> 상점 대체
+	{
+		if (nullptr == _objM)
+			return;
+
+		const lObject& objList = *_objM->getObjectList(eOBJECT_NPC);
+		if (0 == objList.size())
+			return;
+
+		list<int> hitObjList;
+		cilObject end = objList.end();
+		for (cilObject iter = objList.begin(); end != iter; ++iter)
+		{
+			gameObject* obj = *iter;
+			RECT col = obj->getCollision();
+			if (CheckIntersectRect(_collisionAtk, col))
+			{
+				if (ePLAYER_STATE_ATTACK_1 == _state || ePLAYER_STATE_ATTACK_2 == _state)
+					_dir_pushed = (eDIRECTION)(eDIRECTION_LEFT - _dir_LR);
+				else if (ePLAYER_STATE_ATTACK_UP)
+					_dir_pushed = eDIRECTION_DOWN;
+				else if (ePLAYER_STATE_ATTACK_DOWN)
+				{
+					_dir_pushed = eDIRECTION_UP;
+					_isFloating = true;
+				}
+
+				_pushedCntDown = PLAYER_PUSHED_TIME;
+				hitObjList.push_back(obj->getUid());
+			}
+		}
+
+		for (list<int>::iterator it = hitObjList.begin(); hitObjList.end() != it; ++it)
+		{
+			_objM->hitGameObject(*it);
+			_coin -= 10;
+			if(_coin < 0)
+				_coin = 0;
+
+			_uiM->setCoin(_coin);
+
+			saveData();
+		}
+	}
 }
 
 void player::attackUseBullet()
 {
+	POINTF pos = {};
+	float angle = 0.f;
+
+	pos.y = _position.y - 150;
+	if (eDIRECTION_LEFT == _dir_LR)
+	{
+		pos.x = _position.x - 270;
+		angle = PI;
+	}
+	else
+	{
+		pos.x = _position.x;
+		angle = 0.f;
+	}
+
+	_bulletM->firePlayerBullet(pos, angle);
+	_uiM->setSkillGauge(_skillGauge, _skillGaugeMax);
 }
 
 
@@ -770,8 +863,9 @@ bool player::checkInteractionObject(int type)
 			case eOBJECT_CHAIR:
 			{
 				changeState(ePLAYER_STATE_SIT);
-				_position.x = obj->getPosition().x;
-				_position.y = obj->getPosition().y - 20;
+				RECT col = obj->getCollision();
+				_position.x = obj->getPosition().x + (col.right - col.left) / 2;
+				_position.y = col.bottom - 20;
 				break;
 			}
 			case eOBJECT_COIN:
@@ -917,4 +1011,61 @@ bool player::checkFloating()
 	}
 
 	return isFloating;
+}
+
+void player::saveData()
+{
+	vector<string> data;
+
+	{
+		// 최대 체력
+		char str[128];
+		sprintf_s(str, "%d",_maxHp);
+		data.push_back(str);
+	}
+	{
+		// 스킬 게이지
+		char str[128];
+		sprintf_s(str, "%d", _skillGauge);
+		data.push_back(str);
+	}
+	{
+		// 코인
+		char str[128];
+		sprintf_s(str, "%d", _coin);
+		data.push_back(str);
+	}
+
+	{
+		// 저장위치 X, Y
+		char str[128];
+		sprintf_s(str, "%.2f,%.2f", _position.x, _position.y);
+		data.push_back(str);
+	}
+	
+	TXTDATA->txtSave("data/save.txt", data);
+}
+
+void player::loadData()
+{
+	vector<string> data;
+	data = TXTDATA->txtLoad("data/save.txt");
+	
+	if (0 != data.size())
+	{
+		_maxHp = atoi(data[0].c_str());
+		_skillGauge = atoi(data[1].c_str());
+		_coin = atoi(data[2].c_str());
+		_position.x = atoi(data[3].c_str());
+		_position.y = atoi(data[4].c_str());
+
+		if(checkInteractionObject(eOBJECT_CHAIR))
+			changeState(ePLAYER_STATE_SIT);
+
+		if (_uiM)
+		{
+			_uiM->setCoin(_coin);
+			_uiM->setSkillGauge(_skillGauge, _skillGaugeMax);
+		}
+	}
 }

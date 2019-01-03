@@ -137,7 +137,9 @@ vector<string> txtData::charArraySeparation(char charArray[])
 	const char* separator = " ,\n\r"; //±¸ºÐÀÚ
 	char* token;
 
-	token = strtok_s(pcharArray, separator, &temp);
+	token = strtok_s(pcharArray, separator, &temp);\
+	if(NULL == token )
+		return vArray;
 	vArray.push_back(token);
 
 	while (NULL != (token = strtok_s(NULL, separator, &temp)))

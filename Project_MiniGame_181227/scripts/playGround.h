@@ -4,6 +4,7 @@
 #include "ObjectManager.h"
 #include "enemyManager.h"
 #include "bulletManager.h"
+#include "UIManager.h"
 
 class playGround : public gameNode
 {
@@ -12,6 +13,7 @@ private:
 	objectManager*	_objManager;
 	enemyManager*	_enemyManager;
 	bulletManager*	_bulletManager;
+	uiManager*		_uiManager;
 
 	bool _isDataLoaded;
 
@@ -24,3 +26,4 @@ public:
 	playGround();
 	~playGround();
 };
+

@@ -24,7 +24,7 @@ HRESULT bullet::init(POINTF pos, float angle, float speed, float radius, const c
 		{
 			animation* anim = new animation;
 			image* img = IMAGEMANAGER->findImage(pangimgName);
-			anim->init(img, false, 0, img->GetMaxFrameX(), 10, 0);
+			anim->init(img, false, 0, img->GetMaxFrameX(), 5, 0);
 
 			_anim_pang = anim;
 		}
@@ -69,6 +69,18 @@ void bullet::update()
 
 void bullet::render()
 {
+	if (_isDebugMode)
+	{
+		RECT collision = {	  (int)(_colPos.x - _radius)
+							, (int)(_colPos.y - _radius)
+							, (int)(_colPos.x + _radius)
+							, (int)(_colPos.y + _radius) };
+
+		D2DMANAGER->drawRectangle(D2DMANAGER->_defaultBrush
+								  , (float)collision.left, (float)collision.top
+								  , (float)collision.right, (float)collision.bottom);
+	}
+
 	if(_anim )
 		_anim->render(_position.x, _position.y);
 }
@@ -142,8 +154,14 @@ void linearBullet::move()
 	if(eMOVE != _state )
 		return;
 
-	_position.x += cosf(_angle) * _speed;
-	_position.y += sinf(_angle) * _speed;
+	float x = cosf(_angle) * _speed;
+	float y = sinf(_angle) * _speed;
+
+	_position.x += x;
+	_position.y += y;
+
+	_colPos.x += x;
+	_colPos.y += y;
 
 	bullet::move();
 }

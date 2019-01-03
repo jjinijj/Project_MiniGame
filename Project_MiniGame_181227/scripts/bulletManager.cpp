@@ -55,6 +55,27 @@ void bulletManager::update()
 			++_iter;
 		}
 	}
+
+	if (_playerBullet)
+	{
+		if (_playerBullet->isPang())
+		{
+			if(_playerBullet->isAppear())
+				_playerBullet->update();
+			else
+			{
+				SAFE_RELEASE(_playerBullet);
+				SAFE_DELETE(_playerBullet);
+			}
+		}
+		else
+		{
+			if(checkPlayerBulletHitSomething())
+				_playerBullet->hitSomething();
+			else
+				_playerBullet->update();
+		}
+	}
 }
 
 void bulletManager::render()
@@ -63,6 +84,9 @@ void bulletManager::render()
 	{
 		(*_iter)->render();
 	}
+
+	if(_playerBullet)
+		_playerBullet->render();
 }
 
 void bulletManager::release()
@@ -94,6 +118,9 @@ void bulletManager::release()
 	}
 
 	_bulletList.clear();
+
+	SAFE_RELEASE(_playerBullet);
+	SAFE_DELETE(_playerBullet);
 }
 
 bullet* bulletManager::createBullet(eBULLET_TYPE type)
@@ -128,9 +155,34 @@ bullet* bulletManager::createBullet(eBULLET_TYPE type)
 	return newBullet;
 }
 
+void bulletManager::firePlayerBullet(POINTF pos, float angle)
+{
+	POINTF colPos = {};
+
+	_playerBullet = new linearBullet;
+
+	if (angle < PI / 2)
+	{
+		_playerBullet->init(pos, angle, 20, 40, "player_bullet_fire_R", "player_bullet_pang_R");
+		colPos = {pos.x + 270 - 100, pos.y + 100};
+	}
+	else
+	{
+		_playerBullet->init(pos, angle, 20, 40, "player_bullet_fire_L", "player_bullet_pang_L");
+		colPos = { pos.x + 100, pos.y + 100};
+	}
+
+	_playerBullet->setColPos(colPos);
+}
+
+bool bulletManager::checkPlayerBullet()
+{
+	return (!_playerBullet);
+}
+
 bool bulletManager::checkHitSomething(bullet* bt)
 {
-	RECT collision = { (int)(bt->getPosition().x - bt->getRadius()), (int)(bt->getPosition().y - bt->getRadius())
+	RECT collision = { (int)(bt->getPosition().x), (int)(bt->getPosition().y)
 					  ,(int)(bt->getPosition().x + bt->getRadius()), (int)(bt->getPosition().y + bt->getRadius())};
 
 	if ( nullptr != _objM )
@@ -167,6 +219,69 @@ bool bulletManager::checkHitSomething(bullet* bt)
 			return true;
 		}
 	}
+	return false;
+}
+
+bool bulletManager::checkPlayerBulletHitSomething()
+{
+	POINTF pos = _playerBullet->getColPos();
+
+	RECT collision = { (int)(pos.x - _playerBullet->getRadius())
+					 , (int)(pos.y - _playerBullet->getRadius())
+					 , (int)(pos.x + _playerBullet->getRadius())
+					 , (int)(pos.y + _playerBullet->getRadius()) };
+
+	if (nullptr != _objM)
+	{
+		lObject* objList = _objM->getObjectList(eOBJECT_GROUND);
+
+		// 벽 or 블록 이랑 충돌
+		if (objList->size() != 0)
+		{
+			gameObject* obj = nullptr;
+			RECT objCol = {};
+			ilObject end = objList->end();
+
+			for (ilObject iter = objList->begin(); end != iter; ++iter)
+			{
+				obj = (*iter);
+				objCol = (obj->getCollision());
+
+				// todo 충돌 수정해야하마마암아마암암아맘
+				if (CheckIntersectRect(collision, objCol))
+				{
+					return true;
+				}
+			}
+		}
+	}
+
+	if (nullptr != _enemyM)
+	{
+		const lEnemy& emList = _enemyM->getEnemyList();
+
+		// 적과 충돌
+		if (emList.size() != 0)
+		{
+			enemy* em = nullptr;
+			RECT emCol = {};
+			cilEnemy end = emList.end();
+
+			for (cilEnemy iter = emList.begin(); end != iter; ++iter)
+			{
+				em = (*iter);
+				emCol = (em->getCollision());
+
+				// todo 충돌 수정해야하마마암아마암암아맘
+				if (CheckIntersectRect(collision, emCol))
+				{
+					_enemyM->hitEnemy(em->getUid());
+					return true;
+				}
+			}
+		}
+	}
+
 	return false;
 }
 

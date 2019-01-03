@@ -30,7 +30,7 @@ HRESULT gameObject::init(float x, float y, unsigned int uid, const char* imgName
 
 	_position = { x, y };
 	_size = { width, height };
-	_collision = { (int)(x - width / 2), (int)y - height, (int)x + width / 2, (int)y };
+	_collision = { (int)x, (int)y, (int)x + width, (int)y + height };
 
 	_type = eOBJECT_TYPE_NONE;
 	_subType = -1;
@@ -46,24 +46,27 @@ HRESULT gameObject::init(float x, float y, unsigned int uid, const char* imgName
 
 void gameObject::render()
 {
-	WCHAR str[128];
-	swprintf_s(str, L"[UID : %d]", _uid);
-	D2DMANAGER->drawTextD2D(D2DMANAGER->_defaultBrush, L"나눔고딕", 15.0f
-							, str
-							, _position.x - 50
-							, _position.y - 50
-							, _position.x + 50
-							, _position.y + 50);
+	if ( _isDebugMode )
+	{
+		WCHAR str[128];
+		swprintf_s(str, L"[UID : %d]", _uid);
+		D2DMANAGER->drawTextD2D(D2DMANAGER->_defaultBrush, L"나눔고딕", 15.0f
+								, str
+								, _position.x
+								, _position.y - 20
+								, _position.x + 100
+								, _position.y + 100);
 
-	D2DMANAGER->drawRectangle(D2DMANAGER->_defaultBrush
-							  , (float)_collision.left,  (float)_collision.top
-							  , (float)_collision.right, (float)_collision.bottom);
+		D2DMANAGER->drawRectangle(D2DMANAGER->_defaultBrush
+								  , (float)_collision.left,  (float)_collision.top
+								  , (float)_collision.right, (float)_collision.bottom);
+	}
 
 
 	// 애니메이션이 있으면 애니메이션 렌더
 	if (_anim)
 	{
-		_anim->render(_position.x - _size.x * 0.5, _position.y - _size.y);
+		_anim->render(_position.x, _position.y);
 	}
 	// 애니메이션 없다면, 이미지 렌더
 	else if (_image)
@@ -140,10 +143,11 @@ void gameObject::move()
 
 void gameObject::pushObject(float offsetX, float offsetY)
 {
+	
 	_position.x += offsetX;
 	_position.y += offsetY;
-	_collision = { (int)(_position.x - _size.x / 2), (int)_position.y - _size.y
-				  ,(int)(_position.x + _size.x / 2), (int)_position.y };
+	_collision = { (int)(_position.x), (int)_position.y
+				  ,(int)(_position.x + _size.x), (int)_position.y +_size.y};
 }
 
 
@@ -176,7 +180,7 @@ HRESULT objectGround::init(float x, float y, int width, int height, unsigned int
 	_loopCnt.y = _size.y / imgHeight;
 	_offcut.y = _size.y % imgHeight;
 
-	_collision = { (int)(x - _size.x / 2), (int)y - _size.y, (int)x + _size.x / 2, (int)y };
+	_collision = { (int)(x), (int)y, (int)x + _size.x, (int)y + _size.y };
 	return S_OK;
 }
 
@@ -217,8 +221,8 @@ HRESULT objectGoldRock::init(float x, float y, unsigned int uid, const char* img
 	_anim->start();
 
 	_size = { _image->GetFrameWidth(), _image->GetFrameHeight() };
-	_collision = {	 (int)(x - _size.x / 2), (int)y - _size.y
-					,(int)(x + _size.x / 2), (int)y };
+	_collision = {	 (int)(x), (int)y
+					,(int)(x + _size.x), (int) y + _size.y };
 
 	_crashCount = 5;
 	_dir = 1;
@@ -283,14 +287,14 @@ HRESULT objectCoin::init(float x, float y, unsigned int uid, const char * imgNam
 	_anim->start();
 
 	_size = { _image->GetFrameWidth(), _image->GetFrameHeight() };
-	_collision = { (int)(x - _size.x / 2), (int)y - _size.y
-				  ,(int)(x + _size.x / 2), (int)y };
+	_collision = { (int)(x), (int)y
+				  ,(int)(x + _size.x), (int)y + _size.y };
 
 
 	_isMoveable = true;
 	_isInteractionable = true;
 
-	_vecX = RND->getFromIntTo(1, 10);
+	_vecX = RND->getFromIntTo(1, 5);
 	_vecY = RND->getFromIntTo(5, 20);
 
 	int value = RND->getInt(2);
@@ -320,8 +324,8 @@ void objectCoin::move()
 	//if(-10 < _vecY)
 		_vecY -= _gravity;
 
-	_collision = {	 (int)(_position.x - _size.x / 2), (int)_position.y - _size.y
-					,(int)(_position.x + _size.x / 2), (int)_position.y };
+	_collision = {	 (int)(_position.x), (int)_position.y
+					,(int)(_position.x + _size.x), (int)_position.y + _size.y};
 }
 
 void objectCoin::intersectWithObject(gameObject* obj)
@@ -344,7 +348,7 @@ void objectCoin::intersectWithObject(gameObject* obj)
 		{
 			if (obj->getType() == eOBJECT_GROUND)
 			{
-				_position.y = objCol.top;
+				_position.y = objCol.top - _size.y;
 				_isMoveable = false;
 			}
 		}
@@ -405,3 +409,58 @@ void objectCoin::intersectWithObject(gameObject* obj)
 	}
 }
 
+HRESULT objectNPC::init(float x, float y, unsigned int uid, const char* imgName)
+{
+	gameObject::init(x, y, uid, imgName);
+	{
+		animation* anim = new animation;
+		anim->init(_image, true, 0, _image->GetMaxFrameX(), 10, 0);
+		_animMap.insert(make_pair(eLOOK, anim));
+	}
+
+	{
+		animation* anim = new animation;
+		anim->init(_image, true, 0, _image->GetMaxFrameX(), 10, 1);
+		_animMap.insert(make_pair(eIDLE, anim));
+	}
+
+	_anim = _animMap[eIDLE];
+	_anim->start();
+
+	_lookCnt = -1;
+
+	_type = eOBJECT_NPC;
+
+	_size = { _image->GetFrameWidth(), _image->GetFrameHeight() };
+	_collision = { (int)(x), (int)y
+				  ,(int)(x + _size.x), (int)y + _size.y };
+
+	return S_OK;
+}
+
+void objectNPC::update()
+{
+	gameObject::update();
+	if(0 < _lookCnt)
+		--_lookCnt;
+	else if (0 == _lookCnt)
+	{
+		_lookCnt = -1;
+	
+		if(_anim)
+			_anim->end();
+
+		_anim = _animMap[eIDLE];
+		_anim->start();
+	}
+}
+
+void objectNPC::hitObject()
+{
+	_lookCnt = 100;
+
+	if (_anim)
+		_anim->end();
+	_anim = _animMap[eLOOK];
+	_anim->start();
+}

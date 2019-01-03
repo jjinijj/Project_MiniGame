@@ -79,6 +79,7 @@ enum eDIRECTION
 class objectManager;
 class bulletManager;
 class enemyManager;
+class uiManager;
 class gameObject;
 class player: public gameNode
 {
@@ -108,20 +109,19 @@ private:
 	bool _isJumpKeyUp;
 
 	int _skillGauge;
+	int _skillGaugeMax;
 	int _hpCnt;
+	int _maxHp;
 	int _coin;
 
 	int _drowsingCntDown;
 	int _invinCntDown;		// 무적상태 : 피격당했을 때
 	int _pushedCntDown;		// 밀릴때
 
-	bool _showRect;
-	
 	objectManager*	_objM;
 	bulletManager*	_bulletM;
 	enemyManager*	_enemyM;
-
-	
+	uiManager*		_uiM;
 	
 	
 	// 테스트용
@@ -148,7 +148,7 @@ public:
 	void attackUseSword();
 	void attackUseBullet();
 
-	void setManagerLink(objectManager* objM, bulletManager* bulletM, enemyManager* enemyM) {_objM = objM; _bulletM = bulletM; _enemyM = enemyM;}
+	void setManagerLink(objectManager* objM, bulletManager* bulletM, enemyManager* enemyM, uiManager* uiM) {_objM = objM; _bulletM = bulletM; _enemyM = enemyM; _uiM = uiM;}
 	float getPositionX() {return _position.x;}
 	float getPositionY() {return _position.y;}
 	RECT getCollisionRECT() {return _collision;}
@@ -166,4 +166,7 @@ public:
 
 
 
+	// 플레이어 데이터 저장, 로드
+	void saveData();
+	void loadData();
 };

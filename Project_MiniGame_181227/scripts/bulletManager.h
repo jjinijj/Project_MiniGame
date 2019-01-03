@@ -22,6 +22,8 @@ private:
 	list<bullet*> _bulletList;				// 현재 사용중인 bullets
 	list<bullet*>::iterator _iter;			// iterator
 
+	bullet* _playerBullet;					// 플레이어 bullet;
+
 	player* _player;
 	enemyManager* _enemyM;
 	objectManager* _objM;
@@ -34,12 +36,17 @@ public:
 
 	// bullet 생성 : q에서 bullet을 꺼냄
 	bullet* createBullet(eBULLET_TYPE type);
+	void firePlayerBullet(POINTF pos, float angle);
+	bool checkPlayerBullet();
 	void setLink(player* p, enemyManager* emM, objectManager* objM) {_player = p, _enemyM = emM; _objM = objM;}
 
 
 private:
 	// bullet 충돌 확인
 	bool checkHitSomething(bullet* bt);
+	
+	// bullet 충돌 확인
+	bool checkPlayerBulletHitSomething();
 
 	// 맵 안에 있냐?
 	bool checkBulletIntheField(bullet* bt);

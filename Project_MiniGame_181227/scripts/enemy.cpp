@@ -52,22 +52,25 @@ void enemy::release()
 
 void enemy::render()
 {
-	WCHAR str[128];
-	swprintf_s(str, L"[hp : %d / %d] [%d] [%d] [UID : %d] ", _hp, _hp, _dir, _dirUD, _uid);
-	D2DMANAGER->drawTextD2D(D2DMANAGER->_defaultBrush, L"³ª´®°íµñ", 15.0f
-							, str
-							, (float)_collision.left
-							, (float)_collision.top - 50
-							, (float)_collision.right + 100
-							, (float)_collision.bottom + 100);
+	if ( _isDebugMode )
+	{
+		WCHAR str[128];
+		swprintf_s(str, L"[hp : %d / %d] [%d] [%d] [UID : %d] ", _hp, _hp, _dir, _dirUD, _uid);
+		D2DMANAGER->drawTextD2D(D2DMANAGER->_defaultBrush, L"³ª´®°íµñ", 15.0f
+								, str
+								, ( float )_collision.left
+								, ( float )_collision.top - 50
+								, ( float )_collision.right + 100
+								, ( float )_collision.bottom + 100);
 
-	D2DMANAGER->drawRectangle( D2DMANAGER->_defaultBrush
-							 , (float)_collision.left,  (float)_collision.top
-							 , (float)_collision.right, (float)_collision.bottom);
+		D2DMANAGER->drawRectangle(D2DMANAGER->_defaultBrush
+								  , ( float )_collision.left, ( float )_collision.top
+								  , ( float )_collision.right, ( float )_collision.bottom);
 
-	D2DMANAGER->drawEllipse( D2DMANAGER->_defaultBrush
-							  , (float)_position.x - 1, (float)_position.y - 2
-							  , (float)_position.x + 1, (float)_position.y);
+		D2DMANAGER->drawEllipse(D2DMANAGER->_defaultBrush
+								, ( float )_position.x - 1, ( float )_position.y - 2
+								, ( float )_position.x + 1, ( float )_position.y);
+	}
 
 	if ( _anim )
 	{

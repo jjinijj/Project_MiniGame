@@ -10,6 +10,7 @@ enum eOBJECT_TYPE
 	eOBJECT_CHARM,
 	eOBJECT_GROUND,
 	eOBJECT_GOLDROCK,
+	eOBJECT_NPC,
 
 	eOBJECT_TYPE_NONE,
 	eOBJECT_TYPE_COUNT = eOBJECT_TYPE_NONE,
@@ -153,4 +154,24 @@ public:
 
 	int getPrice() {return _value;}
 	void intersectWithObject(gameObject* obj);
+};
+
+class objectNPC: public gameObject
+{
+	enum eNPCSTATE
+	{
+		eIDLE,
+		eLOOK,
+
+		eNONE,
+		eCOUNT = eNONE,
+	};
+
+private:
+	int _lookCnt;
+
+public:
+	HRESULT init(float x, float y, unsigned int uid, const char* imgName);
+	void update();
+	void hitObject();
 };

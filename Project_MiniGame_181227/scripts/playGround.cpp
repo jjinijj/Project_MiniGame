@@ -66,6 +66,7 @@ HRESULT playGround::init()
 
 	// floor
 	IMAGEMANAGER->addImage("floor", L"image/floor.png", 326, 34);
+	IMAGEMANAGER->addImage("floor_stone", L"image/floor_stone.png", 296, 21);
 	
 	// wall
 	IMAGEMANAGER->addImage("wall_L", L"image/wall_L.png", 105, 169);
@@ -73,6 +74,9 @@ HRESULT playGround::init()
 
 	// block
 	IMAGEMANAGER->addImage("block", L"image/block.png", 390, 73);
+
+	// block big
+	IMAGEMANAGER->addImage("block_big", L"image/block_big.png", 677, 209);
 	
 	// chair
 	IMAGEMANAGER->addImage("chair", L"image/chair.png", 185, 92);
@@ -82,6 +86,39 @@ HRESULT playGround::init()
 
 	// coin
 	IMAGEMANAGER->addFrameImage("coin", L"image/coin.png", 104, 28, 4, 1);
+	
+	// ui hp
+	IMAGEMANAGER->addFrameImage("hp", L"image/hp.png", 560, 292, 7, 2);
+	
+	// ui coin
+	IMAGEMANAGER->addImage("coin_ui", L"image/coin_ui.png", 59, 54);
+
+	// ui skill gauage
+	IMAGEMANAGER->addFrameImage("skillGauge_in", L"image/skillGauge_in.png", 480, 156, 2, 1);
+	IMAGEMANAGER->addImage("skillGauge_out", L"image/skillGauge_out.png", 480, 156);
+
+	// ui charmSlot
+	IMAGEMANAGER->addImage("charmSlot", L"image/charmSlot.png", 30, 30);
+
+	// player bullet
+	IMAGEMANAGER->addFrameImage("player_bullet_fire_L", L"image/player_bullet_fire_L.png", 540, 202, 2, 1);
+	IMAGEMANAGER->addFrameImage("player_bullet_pang_L", L"image/player_bullet_pang_L.png", 1080, 202, 4, 1);
+	IMAGEMANAGER->addFrameImage("player_bullet_fire_R", L"image/player_bullet_fire_R.png", 540, 202, 2, 1);
+	IMAGEMANAGER->addFrameImage("player_bullet_pang_R", L"image/player_bullet_pang_R.png", 1080, 202, 4, 1);
+	
+	// ui number
+	IMAGEMANAGER->addFrameImage("number", L"image/number.png", 320, 49, 10, 1);
+	
+	//
+	IMAGEMANAGER->addImage("cliff_L", L"image/cliff_L.png", 513, 372);
+	IMAGEMANAGER->addImage("cliff_R", L"image/cliff_R.png", 513, 372);
+
+	// npc
+	IMAGEMANAGER->addFrameImage("npc", L"image/npc.png", 2219, 376, 7, 2);
+	
+	// item
+	IMAGEMANAGER->addImage("charm1", L"image/charm1_.png", 50, 50);
+	IMAGEMANAGER->addImage("charm2", L"image/charm2_.png", 50, 50);
 
 	_player = new player;
 	_player->init();
@@ -96,13 +133,18 @@ HRESULT playGround::init()
 	_bulletManager = new bulletManager;
 	_bulletManager->init();
 
-	_player->setManagerLink(_objManager, _bulletManager, _enemyManager);
+	_uiManager = new uiManager;
+	_uiManager->init();
+
+	_player->setManagerLink(_objManager, _bulletManager, _enemyManager, _uiManager);
 	_enemyManager->setManagerLink(_objManager, _bulletManager);
 	_enemyManager->setPlayerLink(_player);
 	
 	_bulletManager->setLink(_player, _enemyManager, _objManager);
 
 	CAMERA->setLinkPlayer(_player);
+
+	_player->loadData();
 	
 	return S_OK;
 }
@@ -123,19 +165,29 @@ void playGround::release()
 
 void playGround::update()
 {
-	if ( KEYMANAGER->isOnceKeyDown('R') )
+	if ( KEYMANAGER->isOnceKeyDown(VK_F1) )
 	{
-		release();
+		_isDebugMode = !_isDebugMode;
 
-		init();
-		return;
+		if (_isDebugMode)
+		{
+			if (KEYMANAGER->isOnceKeyDown('R'))
+			{
+				release();
+
+				init();
+				return;
+			}
+		}
 	}
+
 	gameNode::update();
 
 	_player->update();
 	_objManager->update();
 	_enemyManager->update();
 	_bulletManager->update();
+	_uiManager->update();
 }
 
 void playGround::render()
@@ -150,49 +202,52 @@ void playGround::render()
 	_enemyManager->render();
 	_bulletManager->render();
 	_player->render();
+	_uiManager->render();
 
 	//D2DMANAGER->_renderTarget->CreateLayer()
 	//				##		¿©±â¿¡ ÄÚµå ÀÛ¼º(End)		##
 	//===========================================================================
 	//Ä«¸Þ¶ó Á¤º¸ Ãâ·Â
-	WCHAR str[128];
-
-	swprintf_s(str, L"cameraX : %.1f / %.1f", CAMERA->getPosX(), (float)(MAPSIZEX - WINSIZEX));
-	D2DMANAGER->drawTextD2D(D2DMANAGER->_defaultBrush, L"³ª´®°íµñ", 15.0f
-							, str
-							, CAMERA->getPosX()
-							, CAMERA->getPosY()
-							, CAMERA->getPosX() + 300
-							, CAMERA->getPosY() + 100);
 	
-	swprintf_s(str, L"cameraY : %.1f / %.1f", CAMERA->getPosY(), (float)(MAPSIZEY - WINSIZEY));
-	D2DMANAGER->drawTextD2D(D2DMANAGER->_defaultBrush, L"³ª´®°íµñ"
-							, 15.0f
-							, str
-							, CAMERA->getPosX()
-							, CAMERA->getPosY() + 20
-							, CAMERA->getPosX() + 300
-							, CAMERA->getPosY() + 120);
+	if ( _isDebugMode )
+	{
+		WCHAR str[128];
+		swprintf_s(str, L"cameraX : %.1f / %.1f", CAMERA->getPosX(), ( float )( MAPSIZEX - WINSIZEX ));
+		D2DMANAGER->drawTextD2D(D2DMANAGER->_defaultBrush, L"³ª´®°íµñ", 15.0f
+								, str
+								, CAMERA->getPosX() + WINSIZEX - 200
+								, CAMERA->getPosY() + 20
+								, CAMERA->getPosX() + WINSIZEX - 200 + 300
+								, CAMERA->getPosY() + 100);
 
-	//¸¶¿ì½º À§Ä¡ Ãâ·Â
-	swprintf_s(str, L"mouseX : %.2f", _ptMouse.x);
-	D2DMANAGER->drawTextD2D(D2DMANAGER->_defaultBrush
-							, L"¸¼Àº°íµñ"
-							, 15.0f
-							, str
-							, CAMERA->getPosX() + WINSIZEX - 200
-							, CAMERA->getPosY()
-							, CAMERA->getPosX() + WINSIZEX
-							, CAMERA->getPosY() + 60);
-	swprintf_s(str, L"mouseY : %.2f", _ptMouse.y);
-	D2DMANAGER->drawTextD2D(D2DMANAGER->_defaultBrush, L"¸¼Àº°íµñ"
-							, 15.0f
-							, str
-							, CAMERA->getPosX() + WINSIZEX - 200
-							, CAMERA->getPosY() + 20
-							, CAMERA->getPosX() + WINSIZEX
-							, CAMERA->getPosY() + 80);
+		swprintf_s(str, L"cameraY : %.1f / %.1f", CAMERA->getPosY(), ( float )( MAPSIZEY - WINSIZEY ));
+		D2DMANAGER->drawTextD2D(D2DMANAGER->_defaultBrush, L"³ª´®°íµñ"
+								, 15.0f
+								, str
+								, CAMERA->getPosX() + WINSIZEX - 200
+								, CAMERA->getPosY() + 40
+								, CAMERA->getPosX() + WINSIZEX
+								, CAMERA->getPosY() + 120);
 
+		//¸¶¿ì½º À§Ä¡ Ãâ·Â
+		swprintf_s(str, L"mouseX : %.2f", _ptMouse.x);
+		D2DMANAGER->drawTextD2D(D2DMANAGER->_defaultBrush
+								, L"¸¼Àº°íµñ"
+								, 15.0f
+								, str
+								, CAMERA->getPosX() + WINSIZEX - 200
+								, CAMERA->getPosY() + 60
+								, CAMERA->getPosX() + WINSIZEX
+								, CAMERA->getPosY() + 60);
+		swprintf_s(str, L"mouseY : %.2f", _ptMouse.y);
+		D2DMANAGER->drawTextD2D(D2DMANAGER->_defaultBrush, L"¸¼Àº°íµñ"
+								, 15.0f
+								, str
+								, CAMERA->getPosX() + WINSIZEX - 200
+								, CAMERA->getPosY() + 80
+								, CAMERA->getPosX() + WINSIZEX
+								, CAMERA->getPosY() + 80);
+	}
 	// Draw ³¡ - ÀÌ ÄÚµå°¡ ºüÁö¸é D2D Ãâ·Â X
 	D2DMANAGER->endDraw();
 }

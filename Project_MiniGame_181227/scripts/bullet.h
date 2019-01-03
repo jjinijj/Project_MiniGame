@@ -32,6 +32,10 @@ protected:
 	float _speed;
 	float _radius;
 
+	bool _islongBullet;
+
+	POINTF _colPos;
+
 	eSTATE _state;
 	eBULLET_TYPE _type;
 	bool _isAppear;
@@ -47,6 +51,9 @@ public:
 	virtual void move();
 	virtual void clear();
 	void hitSomething();
+
+	void setColPos(POINTF pos) {_colPos = pos;}
+	POINTF getColPos() {return _colPos;}
 
 	POINTF getPosition()		{ return _position;}
 	float getRadius()			{ return _radius;}

@@ -147,6 +147,8 @@
     <ClInclude Include="scripts\targetver.h" />
     <ClInclude Include="scripts\tiktik.h" />
     <ClInclude Include="scripts\txtData.h" />
+    <ClInclude Include="scripts\UIManager.h" />
+    <ClInclude Include="scripts\uiNode.h" />
     <ClInclude Include="scripts\utils.h" />
   </ItemGroup>
   <ItemGroup>
@@ -175,6 +177,8 @@
     <ClCompile Include="scripts\stdafx.cpp" />
     <ClCompile Include="scripts\tiktik.cpp" />
     <ClCompile Include="scripts\txtData.cpp" />
+    <ClCompile Include="scripts\UIManager.cpp" />
+    <ClCompile Include="scripts\uiNode.cpp" />
     <ClCompile Include="scripts\utils.cpp" />
     <ClCompile Include="scripts\windowsAPI.cpp" />
   </ItemGroup>

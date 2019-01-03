@@ -56,6 +56,9 @@ public:
 	void hitEnemy(int uid);
 	const lEnemy& getEnemyList() {return _enemyList;}
 
+	void saveData();
+	void loadData();
+
 private:
 	enemy* findEnemy(int uid);
 	bool checkAllLinkedFinish() {return (_objM  != nullptr && _bulletM != nullptr);}
