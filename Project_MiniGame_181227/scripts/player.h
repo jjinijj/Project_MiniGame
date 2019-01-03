@@ -36,6 +36,11 @@ enum
 	// 밀리는 힘의 크기
 	PLAYER_PUSHED_POW = 2,
 
+	// 캐릭터 초기  스텟
+	PLAYER_MAX_HP = 5,
+	PLAYER_ATTACK_RANGE_X = 100,
+	PLAYER_ATTACK_RANGE_Y = 25,
+
 };
 
 enum ePLAYER_STATE
@@ -114,6 +119,7 @@ private:
 	int _hpCnt;
 	int _maxHp;
 	int _coin;
+	int _ability;	// 추가 능력치 : 아이템효과
 
 	int _drowsingCntDown;
 	int _invinCntDown;		// 무적상태 : 피격당했을 때
@@ -145,6 +151,8 @@ public:
 
 	void takeDamage();
 	void changeCoin(int value);
+
+	void changeCharm(int charmType);
 
 	void attackUseSword();
 	void attackUseBullet();

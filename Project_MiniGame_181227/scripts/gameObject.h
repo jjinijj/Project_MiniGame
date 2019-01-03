@@ -11,6 +11,7 @@ enum eOBJECT_TYPE
 	eOBJECT_GROUND,
 	eOBJECT_GOLDROCK,
 	eOBJECT_NPC,
+	eOBJECT_GAHCA,
 
 	eOBJECT_TYPE_NONE,
 	eOBJECT_TYPE_COUNT = eOBJECT_TYPE_NONE,
@@ -175,4 +176,39 @@ public:
 	HRESULT init(float x, float y, unsigned int uid, const char* imgName);
 	void update();
 	void hitObject();
+};
+
+class objectGacha : public gameObject
+{
+private:
+
+
+public:
+
+	HRESULT init(float x, float y, unsigned int uid, const char* imgName);
+	void update();
+	void hitObject();
+};
+
+class objectCharm : public gameObject
+{
+	enum eCHARM
+	{
+		eHP,
+		eLONG,
+
+		eCHARM_NONE,
+		eCHARM_COUNT = eCHARM_NONE,
+	};
+
+private:
+	float _vecX;
+	float _vecY;
+	float _gravity;
+
+public:
+	HRESULT init(float x, float y, unsigned int uid, const char* imgName);
+	void update();
+	void move();
+	void intersectWithObject(gameObject* obj);
 };

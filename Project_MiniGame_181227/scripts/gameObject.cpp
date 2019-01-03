@@ -332,7 +332,6 @@ void objectCoin::move()
 {
 	if(!_isMoveable)
 		return;
-	_time += 0.5f;
 	_position.x += _vecX;
 	_position.y -= _vecY;
 
@@ -424,9 +423,15 @@ void objectCoin::intersectWithObject(gameObject* obj)
 	}
 }
 
+
+
+////////////////////////////////////////////////////////////////////////////////////
+//									 NPC
+////////////////////////////////////////////////////////////////////////////////////
 HRESULT objectNPC::init(float x, float y, unsigned int uid, const char* imgName)
 {
 	gameObject::init(x, y, uid, imgName);
+	
 	{
 		animation* anim = new animation;
 		anim->init(_image, true, 0, _image->GetMaxFrameX(), 10, 0);
@@ -478,4 +483,173 @@ void objectNPC::hitObject()
 		_anim->end();
 	_anim = _animMap[eLOOK];
 	_anim->start();
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////
+//									 GACHA
+////////////////////////////////////////////////////////////////////////////////////
+HRESULT objectGacha::init(float x, float y, unsigned int uid, const char* imgName)
+{
+	gameObject::init(x, y, uid, imgName);
+
+	_anim= new animation;
+	_anim->init(_image, false, 0, _image->GetMaxFrameX(), 5, 0);
+
+	_type = eOBJECT_GAHCA;
+
+	_size = { _image->GetFrameWidth(), _image->GetFrameHeight() };
+	_collision = { (int)(x), (int)y
+		,(int)(x + _size.x), (int)y + _size.y };
+
+
+	return S_OK;
+}
+
+void objectGacha::update()
+{
+	gameObject::update();
+}
+
+void objectGacha::hitObject()
+{
+	_anim->end();
+	_anim->start();
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////////
+//									 CHARM
+////////////////////////////////////////////////////////////////////////////////////
+HRESULT objectCharm::init(float x, float y, unsigned int uid, const char* imgName)
+{
+	gameObject::init(x, y, uid, imgName);
+
+	_isInteractionable = true;
+	_isMoveable = true;
+
+	_vecX = RND->getFromIntTo(1, 5);
+	_vecY = RND->getFromIntTo(5, 20);
+
+	// todo 임시구현. 
+	_subType = RND->getInt(eCHARM_COUNT);
+	if ( 0 == _subType )
+	{
+		_subType = eHP;
+		_image = IMAGEMANAGER->findImage("charm1");
+	}
+	else
+	{
+		_subType = eLONG;
+		_image = IMAGEMANAGER->findImage("charm2");
+	}
+
+	assert( nullptr != _image);
+
+	_type = eOBJECT_CHARM;
+	_gravity = 0.5f;
+
+	return S_OK;
+}
+
+void objectCharm::update()
+{
+	gameObject::update();
+	move();
+}
+
+void objectCharm::move()
+{
+	if(!_isMoveable)
+		return;
+
+	_position.x += _vecX;
+	_position.y -= _vecY;
+
+	_vecY -= _gravity;
+
+	_collision = {	 (int)(_position.x), (int)_position.y
+		,(int)(_position.x + _size.x), (int)_position.y + _size.y};
+}
+
+void objectCharm::intersectWithObject(gameObject* obj)
+{
+	if(nullptr ==  obj)
+		return;
+
+
+	RECT objCol = obj->getCollision();
+
+	float offsetX = GetIntersectOffsetX(_collision, objCol);
+	float offsetY = GetIntersectOffsetY(_collision, objCol);
+
+	// 상하
+	if (objCol.left <= _collision.left && _collision.right < objCol.right)
+	{
+		pushObject(0.f, offsetY);
+
+		if (_position.y < obj->getPosition().y)
+		{
+			if (obj->getType() == eOBJECT_GROUND)
+			{
+				_position.y = objCol.top - _size.y;
+				_isMoveable = false;
+			}
+		}
+		else
+		{
+			_vecY = 0;
+		}
+	}
+	// 좌우
+	else if (objCol.top <= _collision.top && _collision.bottom <= objCol.bottom)
+	{
+		pushObject(offsetX, 0.f);
+		pushObject(offsetX, 0.f);
+		if (_position.x < obj->getPosition().x)
+		{
+			if( 0 < _vecX)
+				_vecX *= -1;
+		}
+		else
+		{
+			if (_vecX < 0)
+				_vecX *= -1;
+		}
+	}
+	// 모서리
+	else if (abs(offsetX) < abs(offsetY))
+	{
+		pushObject(offsetX, 0.f);
+		pushObject(offsetX, 0.f);
+		if (1 < abs(_vecY))
+			_vecY -= 1;
+		if (_position.x < obj->getPosition().x)
+		{
+			if (0 < _vecX)
+				_vecX *= -1;
+		}
+		else
+		{
+			if (_vecX < 0)
+				_vecX *= -1;
+		}
+	}
+	// 모서리
+	else
+	{
+		if (_position.y < obj->getPosition().y)
+		{
+			if (obj->getType() == eOBJECT_GROUND)
+			{
+				_isMoveable = false;
+			}
+		}
+		else
+		{
+			if (_vecY < 0)
+				_vecY = 0;
+		}
+	}
 }

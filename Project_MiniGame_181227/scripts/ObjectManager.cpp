@@ -85,14 +85,21 @@ void objectManager::setMap()
 	/////////////////////////////////////////////////////////////
 	// µ· ¹ÙÀ§
 	{
-		createGameObject(180, 730, eOBJECT_GOLDROCK);
+		createGameObject(180, 750, eOBJECT_GOLDROCK);
 		createGameObject(1800, MAPSIZEY - 124, eOBJECT_GOLDROCK);
+		createGameObject(1820, 1300 - 100, eOBJECT_GOLDROCK);
 	}
 
 	/////////////////////////////////////////////////////////////
 	// npc
 	{
 		createGameObject(900, 10, eOBJECT_NPC);
+	}
+
+	/////////////////////////////////////////////////////////////
+	// gacha
+	{
+		createGameObject(100, 430, eOBJECT_GAHCA);
 	}
 
 	//////////////////////////////////////////////////////////////
@@ -155,6 +162,14 @@ void objectManager::createGameObject(int x, int y, eOBJECT_TYPE type)
 		}
 		case eOBJECT_CHARM:
 		{	
+			obj = new objectCharm;
+			
+			int value = RND->getInt(2);
+			if ( 0 == value )
+				obj->init(x, y, _objCnt, "charm1");
+			else
+				obj->init(x, y, _objCnt, "charm2");
+
 			break;
 		}
 		case eOBJECT_GROUND:
@@ -174,7 +189,13 @@ void objectManager::createGameObject(int x, int y, eOBJECT_TYPE type)
 			obj = new objectNPC;
 			obj->init(x, y, _objCnt, "npc");
 			break;
-			
+		}
+
+		case eOBJECT_GAHCA:
+		{
+			obj = new objectGacha;
+			obj->init(x, y, _objCnt, "gacha");
+			break;
 		}
 	}
 
@@ -199,6 +220,7 @@ void objectManager::hitGameObject(int uid)
 			case eOBJECT_COIN:	 { break; }
 			case eOBJECT_CHARM:	 { break; }
 			case eOBJECT_GROUND: { break; }
+			case eOBJECT_NPC:	 { break; }
 			case eOBJECT_GOLDROCK:
 			{
 				RECT col = obj->getCollision();
@@ -224,8 +246,16 @@ void objectManager::hitGameObject(int uid)
 				break;
 			}
 
-			case eOBJECT_NPC:
+			case eOBJECT_GAHCA:
 			{
+				RECT	col = obj->getCollision();
+				POINTF	pos = {(col.right - col.left) / 2 + col.left, col.top};
+				
+				int value = RND->getInt(100);
+				if ( value < 10)
+					createGameObject(pos.x, pos.y, eOBJECT_CHARM);
+				else
+					createGameObject(pos.x, pos.y, eOBJECT_COIN);
 				break;
 			}
 
@@ -251,7 +281,12 @@ void objectManager::intersectObject(int uid)
 
 				break;
 			}
-			case eOBJECT_CHARM:		{ break; }
+			case eOBJECT_CHARM:
+			{
+				_player->changeCharm(obj->getSubType());
+				removeGameObject(obj->getUid());
+				break; 
+			}
 			case eOBJECT_GROUND:	{ break; }
 			case eOBJECT_GOLDROCK:	{ break; }
 
@@ -373,7 +408,11 @@ void objectManager::intersectObjectWithObject(gameObject* obj)
 	{
 		gameObject* obj2 = (*iter);
 
-		if(obj2->isMoveable() || obj2->getType() == eOBJECT_GOLDROCK || obj2->getType() == eOBJECT_COIN)
+		if(	  obj2->isMoveable()
+		   || obj2->getType() == eOBJECT_GOLDROCK
+		   || obj2->getType() == eOBJECT_COIN 
+		   || obj2->getType() == eOBJECT_GAHCA
+		   || obj2->getType() == eOBJECT_CHARM)
 			continue;
 
 		objCol = obj->getCollision();

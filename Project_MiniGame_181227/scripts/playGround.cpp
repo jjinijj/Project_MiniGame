@@ -119,6 +119,11 @@ HRESULT playGround::init()
 	// item
 	IMAGEMANAGER->addImage("charm1", L"image/charm1_.png", 50, 50);
 	IMAGEMANAGER->addImage("charm2", L"image/charm2_.png", 50, 50);
+	
+	// 
+	IMAGEMANAGER->addFrameImage("gacha", L"image/gacha.png", 744, 278, 8, 1);
+
+
 
 	_player = new player;
 	_player->init();

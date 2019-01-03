@@ -179,6 +179,8 @@ HRESULT player::init()
 	_invinCntDown = 0;
 	_drowsingCntDown = 0;
 
+	_ability = -1;
+
 	_genPosition = _position;
 
 	return S_OK;
@@ -252,6 +254,8 @@ void player::update()
 				else if ( checkInteractionObject(eOBJECT_CHAIR) )
 				{
 					saveData();
+					_hpCnt = _maxHp;
+					_uiM->setHpMaxCount(_hpCnt);
 				}
 				else if ( ePLAYER_STATE_IDLE == _state )
 				{
@@ -460,6 +464,7 @@ void player::update()
 		updateCollision();
 		evaluateEvent();
 		checkInteractionObject(eOBJECT_COIN);
+		checkInteractionObject(eOBJECT_CHARM);
 
 		if (checkFloating())
 		{
@@ -704,9 +709,39 @@ void player::changeCoin(int value)
 		_uiM->setCoin(_coin);
 }
 
+void player::changeCharm(int charmType)
+{
+	if( charmType == _ability )
+		return;
+
+	// todo 하드코딩말고...
+	// 기존 능력치 해제
+	if ( 1 == _ability ) // atk range
+		_atkRange = { PLAYER_ATTACK_RANGE_X, PLAYER_ATTACK_RANGE_Y };
+	else if ( 0 == _ability )	// hp
+	{
+		_maxHp = PLAYER_MAX_HP;
+		_uiM->setHpMaxCount(_maxHp);
+		_hpCnt = _maxHp;
+	}
+
+	// todo 하드코딩말고...
+	// 새로운 능력치 적용
+	if ( 1 == charmType ) // atk range
+		_atkRange = { PLAYER_ATTACK_RANGE_X + 50, PLAYER_ATTACK_RANGE_Y };
+	else if ( 0 == charmType )	// hp
+	{
+		_maxHp = PLAYER_MAX_HP + 3;
+		_uiM->setHpMaxCount(_maxHp);
+		_hpCnt = _maxHp;
+	}
+
+	_ability = charmType;
+}
+
 void player::attackUseSword()
 {
-		//  적 공격
+	//  적 공격
 	{
 		if (nullptr == _enemyM)
 			return;
@@ -787,7 +822,7 @@ void player::attackUseSword()
 			_objM->hitGameObject(*it);
 	}
 
-	// npc 공격 -> 상점 대체
+	// npc 공격 : 그냥 넣어봄
 	{
 		if (nullptr == _objM)
 			return;
@@ -822,11 +857,52 @@ void player::attackUseSword()
 		for (list<int>::iterator it = hitObjList.begin(); hitObjList.end() != it; ++it)
 		{
 			_objM->hitGameObject(*it);
-			_coin -= 10;
-			if(_coin < 0)
-				_coin = 0;
+		}
+	}
 
-			_uiM->setCoin(_coin);
+	// 가챠 -> 상점 대체
+	if(_coin < 10 )
+		return;
+
+	{
+		if (nullptr == _objM)
+			return;
+
+		const lObject& objList = *_objM->getObjectList(eOBJECT_GAHCA);
+		if (0 == objList.size())
+			return;
+
+		list<int> hitObjList;
+		cilObject end = objList.end();
+		for (cilObject iter = objList.begin(); end != iter; ++iter)
+		{
+			gameObject* obj = *iter;
+			RECT col = obj->getCollision();
+			if (CheckIntersectRect(_collisionAtk, col))
+			{
+				if (ePLAYER_STATE_ATTACK_1 == _state || ePLAYER_STATE_ATTACK_2 == _state)
+					_dir_pushed = (eDIRECTION)(eDIRECTION_LEFT - _dir_LR);
+				else if (ePLAYER_STATE_ATTACK_UP)
+					_dir_pushed = eDIRECTION_DOWN;
+				else if (ePLAYER_STATE_ATTACK_DOWN)
+				{
+					_dir_pushed = eDIRECTION_UP;
+					_isFloating = true;
+				}
+
+				_pushedCntDown = PLAYER_PUSHED_TIME;
+				hitObjList.push_back(obj->getUid());
+			}
+		}
+
+		for (list<int>::iterator it = hitObjList.begin(); hitObjList.end() != it; ++it)
+		{
+			_objM->hitGameObject(*it);
+			//_coin -= 10;
+			//if(_coin < 0)
+			//	_coin = 0;
+			//
+			//_uiM->setCoin(_coin);
 		}
 	}
 }
@@ -876,6 +952,7 @@ bool player::checkInteractionObject(int type)
 			}
 			case eOBJECT_CHARM:
 			{
+				_objM->intersectObject(obj->getUid());
 				break;
 			}
 		}
@@ -1036,7 +1113,12 @@ void player::saveData()
 		sprintf_s(str, "%d", _coin);
 		data.push_back(str);
 	}
-
+	{
+		// 추가 능력치
+		char str[128];
+		sprintf_s(str, "%d", _ability);
+		data.push_back(str);
+	}
 	{
 		// 저장위치 X, Y
 		char str[128];
@@ -1056,15 +1138,20 @@ void player::loadData()
 	vector<string> data;
 	data = TXTDATA->txtLoad("data/playerData.txt");
 	
-	if (0 != data.size())
+	if (6 == data.size())
 	{
-		_maxHp = atoi(data[0].c_str());
+		int ability = -1;
+
+		_maxHp		= atoi(data[0].c_str());
 		_skillGauge = atoi(data[1].c_str());
-		_coin = atoi(data[2].c_str());
-		_position.x = atoi(data[3].c_str());
-		_position.y = atoi(data[4].c_str());
+		_coin		= atoi(data[2].c_str());
+		ability	= atoi(data[3].c_str());
+		_position.x = atoi(data[4].c_str());
+		_position.y = atoi(data[5].c_str());
 
 		_genPosition = _position;
+
+		changeCharm(ability);
 
 		if(checkInteractionObject(eOBJECT_CHAIR))
 			changeState(ePLAYER_STATE_SIT);

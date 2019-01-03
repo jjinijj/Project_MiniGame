@@ -77,8 +77,12 @@ void uiManager::render()
 {
 	_skillGauge->render();
 
-	for (_iter_hp = _hp.begin(); _hp.end() != _iter_hp; ++_iter_hp)
-		(*_iter_hp)->render();
+	for ( _iter_hp = _hp.begin(); _hp.end() != _iter_hp; ++_iter_hp )
+	{
+		uiSprite* hp = (*_iter_hp);
+		if(hp->isRender())
+			hp->render();
+	}
 
 	_coinUi->render();
 
@@ -92,37 +96,53 @@ void uiManager::render()
 
 void uiManager::setHpMaxCount(int value)
 {
-	_hpCnt = _hp.size();
-	if (_hpCnt < value)
+	int hpCnt = _hp.size();
+	if (hpCnt < value)
 	{
 		image* hpImg = IMAGEMANAGER->findImage("hp");
-		int plus = _hpCnt - value;
-		for (int ii = 0; ii < plus; ++ii)
+		for (int ii = 0; ii < value; ++ii)
 		{
-			uiSprite* hp = new uiSprite;
-			hp->init(ii * 80 + 160, 10);
-
+			if( ii < hpCnt )
+				_hp[ii]->setSpriteAnim(eFILL);
+			else
 			{
-				animation* anim = new animation;
-				anim->init(hpImg, true, 0, 4, 5, 0);
-				hp->pushBackAnim(eFILL, anim);
+				uiSprite* hp = new uiSprite;
+				hp->init(ii * 80 + 160, 10);
+
+				{
+					animation* anim = new animation;
+					anim->init(hpImg, true, 0, 4, 5, 0);
+					hp->pushBackAnim(eFILL, anim);
+				}
+
+				{
+					animation* anim = new animation;
+					anim->init(hpImg, false, 0, 6, 5, 1);
+					hp->pushBackAnim(eCRASH, anim);
+				}
+
+				hp->setSpriteAnim(eFILL);
+				_hp.push_back(hp);
 			}
 
+			_hp[ii]->setIsRender(true);
+		}
+	}
+	else 
+	{
+		for (int ii = 0; ii < hpCnt; ++ii)
+		{
+			if( value <= ii )
+				_hp[ii]->setIsRender(false);
+			else
 			{
-				animation* anim = new animation;
-				anim->init(hpImg, false, 0, 6, 5, 1);
-				hp->pushBackAnim(eCRASH, anim);
+				_hp[ii]->setIsRender(true);
+				_hp[ii]->setSpriteAnim(eFILL);
 			}
-
-			hp->setSpriteAnim(eFILL);
-			_hp.push_back(hp);
 		}
 	}
 
-	for (int ii = 0; ii < _hpCnt; ++ii)
-	{
-		_hp[ii]->setSpriteAnim(eFILL);
-	}
+	_hpCnt = value;
 }
 
 void uiManager::setHpCurCount(int value)
