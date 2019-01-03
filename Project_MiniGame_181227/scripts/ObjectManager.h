@@ -15,14 +15,12 @@ class objectManager : public singletonBase<objectManager>
 {
 private:
 	lObject		_objList;
-	lObject		_pushList;
 	ilObject	_iter;
 	ilObject	_iter_end;
 
 	player* _player;
 
 	int _objCnt;
-	bool _isPushbacking;
 
 public:
 
@@ -32,6 +30,8 @@ public:
 	void release();
 
 	void setLinkPlayer(player* target) {_player = target;}
+
+	void setMap();
 
 	//
 	void createGround(int x, int y, const char* imgName);
@@ -44,6 +44,9 @@ public:
 
 	gameObject* findGameObject(int uid);
 	lObject* getObjectList(eOBJECT_TYPE type);
+
+	void saveData();
+	void loadData();
 
 private:
 	void intersectObjectWithObject(gameObject* obj);

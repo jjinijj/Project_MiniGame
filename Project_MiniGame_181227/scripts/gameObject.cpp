@@ -115,13 +115,13 @@ void gameObject::release()
 	for (_iter = _animMap.begin(); _iter_end != _iter; ++_iter)
 	{
 		SAFE_RELEASE((*_iter).second);
-		SAFE_RELEASE((*_iter).second);
+		SAFE_DELETE((*_iter).second);
 	}
 
 	if (_anim)
 	{
 		SAFE_RELEASE(_anim);
-		SAFE_RELEASE(_anim);
+		SAFE_DELETE(_anim);
 	}
 
 	_animMap.clear();
@@ -271,6 +271,21 @@ void objectGoldRock::hitObject()
 		_anim->start();
 
 		_isCrash = true;
+	}
+}
+
+void objectGoldRock::setFin(bool fin)
+{
+	_isFin = fin;
+
+	if ( fin && !_isCrash )
+	{
+		_isCrash = true;
+		if (_anim)
+			_anim->end();
+		_anim = _animMap[eGOLDROCK_STATE_CRASH];
+		_anim->start();
+		_crashCount = 0;
 	}
 }
 

@@ -156,7 +156,30 @@ HRESULT player::init()
 	}
 
 
-	resetPlayer();
+	_dir_LR = eDIRECTION_RIGHT;
+
+	_position.x = 100;
+	_position.y = MAPSIZEY - 100;
+
+	_size = { PLAYER_SIZE_WIDE, PLAYER_SIZE_HEIGHT };
+	_atkRange = { 100, 25 };
+
+	_anim = _animMap[ePLAYER_STATE_IDLE];
+	_anim->start();
+
+	_gravity = (float)PLAYER_GRAVITY;
+
+	_hpCnt = _maxHp = 5;
+	_isAlive = true;
+
+	_skillGaugeMax = 10;
+	_skillGauge = 0;
+
+	_pushedCntDown = 0;
+	_invinCntDown = 0;
+	_drowsingCntDown = 0;
+
+	_genPosition = _position;
 
 	return S_OK;
 }
@@ -540,43 +563,23 @@ void player::render()
 
 void player::resetPlayer()
 {
-	//_collisionChair = { 500, 400, 700, 500 };
-
-	_dir_LR = eDIRECTION_RIGHT;
-
-	_position.x = 100;
-	_position.y = MAPSIZEY - 100;
-
-	_size = { PLAYER_SIZE_WIDE, PLAYER_SIZE_HEIGHT };
-	_atkRange = { 100, 25 };
+	_position = _genPosition;
 
 	_anim = _animMap[ePLAYER_STATE_IDLE];
 	_anim->start();
 
 	_gravity = (float)PLAYER_GRAVITY;
 
-	_hpCnt = _maxHp = 5;
+	_hpCnt = _maxHp;
 	_isAlive = true;
 
-	_skillGaugeMax = 10;
-	_skillGauge = 0;
-
 	_pushedCntDown = 0;
-	_invinCntDown = 0;
+	_invinCntDown = PLAYER_INVINCIBILITY_TIME;
 	_drowsingCntDown = 0;
 
-	if (_uiM)
-	{
-		_uiM->setHpMaxCount(_hpCnt);
-		_uiM->setHpCurCount(_hpCnt);
-	}
-
-	if (_uiM)
-	{
-		_uiM->setSkillGauge(_skillGauge, _skillGaugeMax);
-	}
-
-	loadData();
+	_uiM->setHpMaxCount(_hpCnt);
+	_uiM->setHpCurCount(_hpCnt);
+	_uiM->setSkillGauge(_skillGauge, _skillGaugeMax);
 }
 void player::move()
 {
@@ -824,8 +827,6 @@ void player::attackUseSword()
 				_coin = 0;
 
 			_uiM->setCoin(_coin);
-
-			saveData();
 		}
 	}
 }
@@ -1041,15 +1042,19 @@ void player::saveData()
 		char str[128];
 		sprintf_s(str, "%.2f,%.2f", _position.x, _position.y);
 		data.push_back(str);
+		_genPosition = _position;
 	}
 	
-	TXTDATA->txtSave("data/save.txt", data);
+	TXTDATA->txtSave("data/playerData.txt", data);
+
+	_objM->saveData();
+	_enemyM->saveData();
 }
 
 void player::loadData()
 {
 	vector<string> data;
-	data = TXTDATA->txtLoad("data/save.txt");
+	data = TXTDATA->txtLoad("data/playerData.txt");
 	
 	if (0 != data.size())
 	{
@@ -1058,6 +1063,8 @@ void player::loadData()
 		_coin = atoi(data[2].c_str());
 		_position.x = atoi(data[3].c_str());
 		_position.y = atoi(data[4].c_str());
+
+		_genPosition = _position;
 
 		if(checkInteractionObject(eOBJECT_CHAIR))
 			changeState(ePLAYER_STATE_SIT);

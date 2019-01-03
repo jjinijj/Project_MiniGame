@@ -103,7 +103,7 @@ void bullet::clear()
 		SAFE_DELETE(_anim_pang);
 	}
 
-	if ( _anim )
+	if ( _anim != nullptr )
 	{
 		SAFE_RELEASE(_anim);
 		SAFE_DELETE(_anim);

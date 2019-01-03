@@ -37,6 +37,7 @@ HRESULT animation::init(image* img, bool isLoop, int startIdx, int endIdx, int f
 
 void animation::release()
 {
+	_image = nullptr;
 }
 
 void animation::update()

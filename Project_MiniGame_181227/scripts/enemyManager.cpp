@@ -359,6 +359,30 @@ void enemyManager::hitEnemy(int uid)
 	}
 }
 
+void enemyManager::saveData()
+{
+	vector<string> data;
+
+	{
+		// 생성 할 enemy의 uid시작 번호
+		char str[128];
+		sprintf_s(str, "%d",_enemyCnt - _enemyList.size());
+		data.push_back(str);
+	}
+	TXTDATA->txtSave("data/enemyData.txt", data);
+}
+
+void enemyManager::loadData()
+{
+	vector<string> data;
+	data = TXTDATA->txtLoad("data/enemyData.txt");
+
+	if (0 != data.size())
+	{
+		_enemyCnt = atoi(data[0].c_str());
+	}
+}
+
 enemy* enemyManager::findEnemy(int uid)
 {
 	for ( _iter = _enemyList.begin(); _enemyList.end() != _iter; ++_iter )

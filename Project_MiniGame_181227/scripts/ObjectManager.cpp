@@ -4,8 +4,44 @@
 
 void objectManager::init()
 {
+	_objList.clear();
+	_player = nullptr;
+	_objCnt = 0;
+}
 
+void objectManager::update()
+{
+	for (_iter = _objList.begin(); _objList.end() != _iter; ++_iter)
+	{
+		gameObject* obj = (*_iter);
+		obj->update();
+		intersectObjectWithObject(obj);
+	}
+}
 
+void objectManager::render()
+{
+	for (_iter = _objList.begin(); _objList.end() != _iter; ++_iter)
+	{
+		(*_iter)->render();
+	}
+}
+
+void objectManager::release()
+{
+	for (_iter = _objList.begin(); _objList.end() != _iter;)
+	{
+		(*_iter)->release();
+		_iter = _objList.erase(_iter);
+	}
+
+	_objList.clear();
+
+	releaseSingleton();
+}
+
+void objectManager::setMap()
+{
 	//////////////////////////////////////////////////////////
 	// 블록
 	{
@@ -21,7 +57,7 @@ void objectManager::init()
 		createGround(1620, 1300, "block");
 		createGround(1405, 1428, 100, -1, "block");
 		createGround(610, 1630, 300, -1, "block");
-		
+
 		// 11
 		createGround(1100, 1630, "block");
 		createGround(800, 1850, "block");
@@ -33,7 +69,7 @@ void objectManager::init()
 		createGround(660, 3050, "block_big");
 		createGround(100, 3150, "block");
 		createGround(400, 3380, 200, -1, "block");
-		
+
 		// 21
 		createGround(700, 3500, "block");
 		createGround(1400, 3380, 200, -1, "block");
@@ -82,37 +118,6 @@ void objectManager::init()
 		createGround(MAPSIZEX - 85, 0, -1, MAPSIZEY, "wall_R");
 	}
 	// 8
-}
-
-void objectManager::update()
-{
-	for (_iter = _objList.begin(); _objList.end() != _iter; ++_iter)
-	{
-		gameObject* obj = (*_iter);
-		obj->update();
-		intersectObjectWithObject(obj);
-	}
-}
-
-void objectManager::render()
-{
-	for (_iter = _objList.begin(); _objList.end() != _iter; ++_iter)
-	{
-		(*_iter)->render();
-	}
-}
-
-void objectManager::release()
-{
-	for (_iter = _objList.begin(); _objList.end() != _iter;)
-	{
-		(*_iter)->release();
-		_iter = _objList.erase(_iter);
-	}
-
-	_objList.clear();
-
-	releaseSingleton();
 }
 
 void objectManager::createGround(int x, int y, const char* imgName)
@@ -293,6 +298,8 @@ gameObject* objectManager::findGameObject(int uid)
 	return nullptr;
 }
 
+
+
 lObject* objectManager::getObjectList(eOBJECT_TYPE type)
 {
 	lObject* objList = new lObject;
@@ -304,6 +311,49 @@ lObject* objectManager::getObjectList(eOBJECT_TYPE type)
 	}
 
 	return objList;
+}
+
+void objectManager::saveData()
+{
+	vector<string> data;
+
+	// 부서진 코인바위 저장
+	lObject* objList = getObjectList(eOBJECT_GOLDROCK);
+
+	ilObject end = objList->end();
+	for ( ilObject iter = objList->begin(); end != iter; ++iter )
+	{
+		gameObject* obj = (*iter);
+		if ( obj->isCrash() )
+		{
+			char str[128];
+			sprintf_s(str, "%d",obj->getUid());
+			data.push_back(str);
+		}
+	}
+
+	TXTDATA->txtSave("data/mapData.txt", data);
+}
+
+void objectManager::loadData()
+{
+	vector<string> data;
+	data = TXTDATA->txtLoad("data/mapData.txt");
+
+	// 부서진 코인 바위 적용
+	int size = data.size();
+	if (0 != size)
+	{
+		for ( int ii = 0; ii < size; ++ii )
+		{
+			int idx = atoi(data[ii].c_str());
+			gameObject* obj = findGameObject(idx);
+			if ( obj )
+			{
+				obj->setFin(true);
+			}
+		}
+	}
 }
 
 void objectManager::intersectObjectWithObject(gameObject* obj)

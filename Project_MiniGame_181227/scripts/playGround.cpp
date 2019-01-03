@@ -125,7 +125,6 @@ HRESULT playGround::init()
 
 	_objManager = new objectManager;
 	_objManager->init();
-	_objManager->setLinkPlayer(_player);
 
 	_enemyManager = new enemyManager;
 	_enemyManager->init();
@@ -136,7 +135,12 @@ HRESULT playGround::init()
 	_uiManager = new uiManager;
 	_uiManager->init();
 
+	_objManager->setMap();
+
 	_player->setManagerLink(_objManager, _bulletManager, _enemyManager, _uiManager);
+	
+	_objManager->setLinkPlayer(_player);
+	
 	_enemyManager->setManagerLink(_objManager, _bulletManager);
 	_enemyManager->setPlayerLink(_player);
 	
@@ -145,6 +149,8 @@ HRESULT playGround::init()
 	CAMERA->setLinkPlayer(_player);
 
 	_player->loadData();
+	_enemyManager->loadData();
+	_objManager->loadData();
 	
 	return S_OK;
 }
@@ -161,6 +167,9 @@ void playGround::release()
 
 	_enemyManager->release();
 	_enemyManager->releaseSingleton();
+
+	_uiManager->release();
+	_uiManager->releaseSingleton();
 }
 
 void playGround::update()

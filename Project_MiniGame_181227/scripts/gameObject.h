@@ -70,20 +70,21 @@ public:
 	void update();
 	virtual void hitObject();
 	virtual void move();
-	virtual bool isCrash()	{ return false; }
-	virtual bool isFin()	{ return false; }
-	virtual void setFin(bool fin)	{ }
-	virtual int getPrice() { return 0; }
-	virtual void intersectWithObject(gameObject* obj) {}
+	virtual bool isCrash()								{ return false; }
+	virtual bool isFin()								{ return false; }
+	virtual void setFin(bool fin)						{ }
+	virtual int getPrice()								{ return 0; }
+	virtual void intersectWithObject(gameObject* obj)	{}
+	
+	const RECT& getCollision()							{ return _collision;}
+	POINTF getPosition()								{ return _position;}
+	eOBJECT_TYPE getType()								{ return _type;}
+	int getSubType()									{ return _subType;}
+	int getUid()										{ return _uid;}
+	bool isMoveable()									{ return _isMoveable;}
+	bool isInteractionable()							{ return _isInteractionable;}
 	
 	void pushObject(float offsetX, float offsetY);
-	const RECT& getCollision()	{ return _collision;}
-	POINTF getPosition()		{ return _position;}
-	eOBJECT_TYPE getType()		{ return _type;}
-	int getSubType()			{ return _subType;}
-	int getUid()				{ return _uid;}
-	bool isMoveable()			{ return _isMoveable;}
-	bool isInteractionable()	{ return _isInteractionable;}
 	
 };
 
@@ -129,7 +130,7 @@ public:
 
 	bool isCrash()	{ return _isCrash;}
 	bool isFin()	{ return _isFin;}
-	void setFin(bool fin) {_isFin = true;}
+	void setFin(bool fin); 
 };
 
 class objectCoin: public gameObject

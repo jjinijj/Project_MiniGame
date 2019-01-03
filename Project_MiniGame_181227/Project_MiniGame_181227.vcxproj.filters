@@ -75,9 +75,6 @@
     <ClInclude Include="scripts\targetver.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="scripts\minion.h">
-      <Filter>PlayGround</Filter>
-    </ClInclude>
     <ClInclude Include="scripts\playGround.h">
       <Filter>PlayGround</Filter>
     </ClInclude>
@@ -166,9 +163,6 @@
     </ClCompile>
     <ClCompile Include="scripts\windowsAPI.cpp">
       <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="scripts\minion.cpp">
-      <Filter>PlayGround</Filter>
     </ClCompile>
     <ClCompile Include="scripts\playGround.cpp">
       <Filter>PlayGround</Filter>

@@ -93,6 +93,7 @@ private:
 	animation* _anim;
 
 	POINTF _position;	// middle, bottom
+	POINTF _genPosition;	// regen position
 	POINT _size;
 	POINT _atkRange;
 
