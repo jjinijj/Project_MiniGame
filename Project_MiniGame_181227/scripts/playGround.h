@@ -16,6 +16,9 @@ private:
 	uiManager*		_uiManager;
 
 	bool _isDataLoaded;
+	bool _isPlaying;
+
+	image* _title;
 
 public:
 	virtual HRESULT init();

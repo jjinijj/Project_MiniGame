@@ -50,11 +50,11 @@ enum ePLAYER_STATE
 	ePLAYER_STATE_LOOK_UP,
 	ePLAYER_STATE_LOOK_DOWN,
 	ePLAYER_STATE_JUMP,
-	ePLAYER_STATE_ATTACK_1, // 5
-	ePLAYER_STATE_ATTACK_2, // 6
-	ePLAYER_STATE_ATTACK_3, // 7
-	ePLAYER_STATE_ATTACK_UP, // 8
-	ePLAYER_STATE_ATTACK_DOWN, // 9
+	ePLAYER_STATE_ATTACK_1,
+	ePLAYER_STATE_ATTACK_2,
+	ePLAYER_STATE_ATTACK_3,
+	ePLAYER_STATE_ATTACK_UP,
+	ePLAYER_STATE_ATTACK_DOWN,
 	ePLAYER_STATE_SIT,
 	ePLAYER_STATE_DROWSE,
 	ePLAYER_STATE_WAKEUP,
@@ -62,7 +62,6 @@ enum ePLAYER_STATE
 	ePLAYER_STATE_FLYING,
 	ePLAYER_STATE_FALLING,
 	ePLAYER_STATE_LAND,
-	//ePLAYER_STATE_HIT,
 
 	ePLAYER_STATE_NONE,
 	ePLAYER_STATE_COUNT = ePLAYER_STATE_NONE,
@@ -90,12 +89,15 @@ class player: public gameNode
 {
 private:
 	map<ePLAYER_STATE, animation*> _animMap;
+	map<ePLAYER_STATE, animation*> _animMap_effect;
 	map<ePLAYER_STATE, animation*>::iterator _ianiMap;
 	ePLAYER_STATE _state;
 	eDIRECTION _dir_LR;
 	eDIRECTION _dir_UD;
 	eDIRECTION _dir_pushed;
+	
 	animation* _anim;
+	animation* _anim_effect;
 
 	POINTF _position;	// middle, bottom
 	POINTF _genPosition;	// regen position

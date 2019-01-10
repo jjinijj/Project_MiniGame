@@ -19,6 +19,8 @@ private:
 	vector<uiSprite*> _hp;
 	vector<uiSprite*>::iterator _iter_hp;
 	uiImage* _coinUi;
+	
+	image* _charm;
 
 	vector<uiNumText*> _coinText;
 	vector<uiNumText*>::iterator _iter_coin;
@@ -40,4 +42,6 @@ public:
 	void setSkillGauge(int cur, int max);
 
 	void setCoin(int value);
+
+	void setCharm(const char* imgName);
 };

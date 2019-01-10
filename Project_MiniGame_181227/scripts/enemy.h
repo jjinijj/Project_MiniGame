@@ -69,20 +69,19 @@ public:
 	virtual bool isFire();
 	virtual void bulletFire();
 	virtual POINTF getBulletFirePoint();
-
 	void move();
 	void attack();
 	void changeState(int state);
 
 	void takeDamage();
 
-	unsigned int getUid() {return _uid;}
-	bool isAlive() {return _isAlive;}
-	bool isAppear() {return _isAppear;}
-	const RECT& getCollision() {return _collision;}
-	POINTF getPosition() {return MakePointF((float)_position.x, (float)_position.y);}
+	unsigned int getUid()		{ return _uid;}
+	bool isAlive()				{ return _isAlive;}
+	bool isAppear()				{ return _isAppear;}
+	const RECT& getCollision()	{ return _collision;}
+	POINTF getPosition()		{ return MakePointF((float)_position.x, (float)_position.y);}
+	eENEMY_TYPE getEnemyType()	{ return _type;}
 
 	void setManagerLink(objectManager* objM) {_objM = objM;}
-	eENEMY_TYPE getEnemyType() {return _type;}
 };
 

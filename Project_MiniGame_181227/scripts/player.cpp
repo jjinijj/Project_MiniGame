@@ -155,6 +155,27 @@ HRESULT player::init()
 		_animMap.insert(make_pair(ePLAYER_STATE_WALK, anim));
 	}
 
+	// effect swing
+	{
+		animation* anim = new animation;
+		image* img = IMAGEMANAGER->findImage("swing");
+		anim->init(img, false, 0, img->GetMaxFrameX(), PLAYER_MOVE_SPEED, 0);
+		_animMap_effect.insert(make_pair(ePLAYER_STATE_ATTACK_1, anim));
+	}
+
+	{
+		animation* anim = new animation;
+		image* img = IMAGEMANAGER->findImage("swing_updown");
+		anim->init(img, false, 0, 0, PLAYER_MOVE_SPEED, 0);
+		_animMap_effect.insert(make_pair(ePLAYER_STATE_ATTACK_UP, anim));
+	}
+
+	{
+		animation* anim = new animation;
+		image* img = IMAGEMANAGER->findImage("swing_updown");
+		anim->init(img, false, 0,0, PLAYER_MOVE_SPEED, 1);
+		_animMap_effect.insert(make_pair(ePLAYER_STATE_ATTACK_DOWN, anim));
+	}
 
 	_dir_LR = eDIRECTION_RIGHT;
 
@@ -198,6 +219,16 @@ void player::release()
 
 void player::update()
 {
+	if ( KEYMANAGER->isOnceKeyDown(VK_F5) )
+	{
+		changeCharm(0);
+	}
+
+	if ( KEYMANAGER->isOnceKeyDown(VK_F6) )
+	{
+		changeCharm(1);
+	}
+
 	if ( _isAlive )
 	{
 		if( _invinCntDown == 0 )
@@ -396,12 +427,12 @@ void player::update()
 		if (KEYMANAGER->isOnceKeyDown('A'))
 		{
 			// 조건체크
-			if(0 <= _skillGauge)
+			if(3 <= _skillGauge)
 			{
 				if (_bulletM->checkPlayerBullet())
 				{
 					changeState(ePLAYER_STATE_ATTACK_3);
-					_skillGauge -= 0;
+					_skillGauge -= 3;
 				}
 			}
 		}
@@ -528,6 +559,17 @@ void player::update()
 		_anim->update();
 	}
 
+	if ( _anim_effect )
+	{
+		if(_anim_effect->IsPlayingAnimation() )
+			_anim_effect->update();
+		else
+		{
+			_animMap_effect.end();
+			_anim_effect = nullptr;
+		}
+	}
+
 
 }
 
@@ -562,6 +604,40 @@ void player::render()
 			_anim->render(_position.x - PLAYER_SIZE_WIDE_HALF, _position.y - PLAYER_SIZE_HEIGHT, (float)(1 - (_invinCntDown % 10 * 0.1)));
 		else
 			_anim->render(_position.x - PLAYER_SIZE_WIDE_HALF, _position.y - PLAYER_SIZE_HEIGHT);
+	}
+
+	if ( _anim_effect )
+	{
+		POINTF pos = {};
+		switch ( _state )
+		{
+			case ePLAYER_STATE_ATTACK_1:
+			case ePLAYER_STATE_ATTACK_2:
+			{
+				pos.y = _collisionAtk.top;
+				if ( eDIRECTION_LEFT == _dir_LR )
+					pos.x = _collisionAtk.left;
+				else
+					pos.x = _collisionAtk.right - 100;
+
+				break;
+			}
+			case ePLAYER_STATE_ATTACK_UP:
+			{
+				pos.x = _collision.left - 50;
+				pos.y = _collisionAtk.top;
+
+				 break;
+			}
+			case ePLAYER_STATE_ATTACK_DOWN:
+			{
+				pos.x = _collision.left - 50;
+				pos.y = _collisionAtk.bottom - 120;
+				break;
+			}
+		}
+
+		_anim_effect->render(pos.x, pos.y);
 	}
 
 }
@@ -728,11 +804,15 @@ void player::changeCharm(int charmType)
 	// todo 하드코딩말고...
 	// 새로운 능력치 적용
 	if ( 1 == charmType ) // atk range
+	{
 		_atkRange = { PLAYER_ATTACK_RANGE_X + 50, PLAYER_ATTACK_RANGE_Y };
+		_uiM->setCharm("charm2_ui");
+	}
 	else if ( 0 == charmType )	// hp
 	{
 		_maxHp = PLAYER_MAX_HP + 3;
 		_uiM->setHpMaxCount(_maxHp);
+		_uiM->setCharm("charm1_ui");
 		_hpCnt = _maxHp;
 	}
 
@@ -741,6 +821,29 @@ void player::changeCharm(int charmType)
 
 void player::attackUseSword()
 {
+
+	if( _anim_effect )
+		_anim_effect->end();
+
+	// effect
+	if ( ePLAYER_STATE_ATTACK_1 == _state || ePLAYER_STATE_ATTACK_2 == _state )
+	{
+		_anim_effect = _animMap_effect[ePLAYER_STATE_ATTACK_1];
+		_anim_effect->SetFrameY((int)_dir_LR);
+	}
+	else if ( ePLAYER_STATE_ATTACK_UP == _state )
+	{
+		_anim_effect = _animMap_effect[ePLAYER_STATE_ATTACK_UP];
+	}
+	else if (ePLAYER_STATE_ATTACK_DOWN == _state)
+	{
+		_anim_effect = _animMap_effect[ePLAYER_STATE_ATTACK_DOWN];
+	}
+
+	if( _anim_effect )
+		_anim_effect->start();
+
+
 	//  적 공격
 	{
 		if (nullptr == _enemyM)
@@ -758,14 +861,21 @@ void player::attackUseSword()
 			RECT col = em->getCollision();
 			if (CheckIntersectRect(_collisionAtk, col))
 			{
-				if (ePLAYER_STATE_ATTACK_1 == _state || ePLAYER_STATE_ATTACK_2 == _state)
-					_dir_pushed = (eDIRECTION)(eDIRECTION_LEFT - _dir_LR);
-				else if (ePLAYER_STATE_ATTACK_UP)
+				if ( ePLAYER_STATE_ATTACK_1 == _state || ePLAYER_STATE_ATTACK_2 == _state )
+				{
+					_dir_pushed = ( eDIRECTION )( eDIRECTION_LEFT - _dir_LR );
+					_anim_effect = _animMap_effect[ePLAYER_STATE_ATTACK_1];
+				}
+				else if ( ePLAYER_STATE_ATTACK_UP == _state)
+				{
 					_dir_pushed = eDIRECTION_DOWN;
-				else if (ePLAYER_STATE_ATTACK_DOWN)
+					_anim_effect = _animMap_effect[ePLAYER_STATE_ATTACK_UP];
+				}
+				else if (ePLAYER_STATE_ATTACK_DOWN== _state)
 				{
 					_dir_pushed = eDIRECTION_UP;
 					_isFloating = true;
+					_anim_effect = _animMap_effect[ePLAYER_STATE_ATTACK_DOWN];
 				}
 
 				_pushedCntDown = PLAYER_PUSHED_TIME;
@@ -805,9 +915,9 @@ void player::attackUseSword()
 			{
 				if (ePLAYER_STATE_ATTACK_1 == _state || ePLAYER_STATE_ATTACK_2 == _state)
 					_dir_pushed = (eDIRECTION)(eDIRECTION_LEFT - _dir_LR);
-				else if (ePLAYER_STATE_ATTACK_UP)
+				else if (ePLAYER_STATE_ATTACK_UP == _state)
 					_dir_pushed = eDIRECTION_DOWN;
-				else if (ePLAYER_STATE_ATTACK_DOWN)
+				else if (ePLAYER_STATE_ATTACK_DOWN == _state)
 				{
 					_dir_pushed = eDIRECTION_UP;
 					_isFloating = true;
@@ -841,9 +951,9 @@ void player::attackUseSword()
 			{
 				if (ePLAYER_STATE_ATTACK_1 == _state || ePLAYER_STATE_ATTACK_2 == _state)
 					_dir_pushed = (eDIRECTION)(eDIRECTION_LEFT - _dir_LR);
-				else if (ePLAYER_STATE_ATTACK_UP)
+				else if (ePLAYER_STATE_ATTACK_UP == _state)
 					_dir_pushed = eDIRECTION_DOWN;
-				else if (ePLAYER_STATE_ATTACK_DOWN)
+				else if (ePLAYER_STATE_ATTACK_DOWN == _state)
 				{
 					_dir_pushed = eDIRECTION_UP;
 					_isFloating = true;
@@ -861,7 +971,7 @@ void player::attackUseSword()
 	}
 
 	// 가챠 -> 상점 대체
-	if(_coin < 10 )
+	if(_coin < 5 )
 		return;
 
 	{
@@ -882,9 +992,9 @@ void player::attackUseSword()
 			{
 				if (ePLAYER_STATE_ATTACK_1 == _state || ePLAYER_STATE_ATTACK_2 == _state)
 					_dir_pushed = (eDIRECTION)(eDIRECTION_LEFT - _dir_LR);
-				else if (ePLAYER_STATE_ATTACK_UP)
+				else if (ePLAYER_STATE_ATTACK_UP == _state)
 					_dir_pushed = eDIRECTION_DOWN;
-				else if (ePLAYER_STATE_ATTACK_DOWN)
+				else if (ePLAYER_STATE_ATTACK_DOWN == _state)
 				{
 					_dir_pushed = eDIRECTION_UP;
 					_isFloating = true;
@@ -898,11 +1008,11 @@ void player::attackUseSword()
 		for (list<int>::iterator it = hitObjList.begin(); hitObjList.end() != it; ++it)
 		{
 			_objM->hitGameObject(*it);
-			//_coin -= 10;
-			//if(_coin < 0)
-			//	_coin = 0;
-			//
-			//_uiM->setCoin(_coin);
+			_coin -= 5;
+			if(_coin < 0)
+				_coin = 0;
+			
+			_uiM->setCoin(_coin);
 		}
 	}
 }

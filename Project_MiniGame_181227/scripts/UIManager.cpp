@@ -43,6 +43,8 @@ HRESULT uiManager::init()
 
 	_coinText.push_back(ui);
 
+	_charm = IMAGEMANAGER->findImage("charmSlot");
+
 	return S_OK;
 }
 
@@ -92,6 +94,9 @@ void uiManager::render()
 		if(num->isRender())
 			(*_iter_coin)->render();
 	}
+
+	if(_charm )
+		_charm->render(CAMERA->getPosX() + 130, CAMERA->getPosY() + 150);
 }
 
 void uiManager::setHpMaxCount(int value)
@@ -220,4 +225,9 @@ void uiManager::setCoin(int value)
 		_coinText[idx - ii ]->setText(dest);
 		_coinText[ii]->setText(sour);
 	}
+}
+
+void uiManager::setCharm(const char* imgName)
+{
+	_charm = IMAGEMANAGER->findImage(imgName);
 }

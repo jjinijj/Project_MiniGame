@@ -21,6 +21,9 @@ HRESULT playGround::init()
 		_isDataLoaded = true;
 	}
 
+	// title
+	IMAGEMANAGER->addImage("title", L"image/title.png", 800, 1000);
+
 	// 플레이어
 	IMAGEMANAGER->addFrameImage("knight_idle", L"image/knight_idle.png", 568, 266, 4, 2);
 	IMAGEMANAGER->addFrameImage("knight_attack_down", L"image/knight_attack_down.png", 852, 266, 6, 2);
@@ -99,6 +102,8 @@ HRESULT playGround::init()
 
 	// ui charmSlot
 	IMAGEMANAGER->addImage("charmSlot", L"image/charmSlot.png", 30, 30);
+	IMAGEMANAGER->addImage("charm1_ui", L"image/charm1.png", 30, 30);
+	IMAGEMANAGER->addImage("charm2_ui", L"image/charm2.png", 30, 30);
 
 	// player bullet
 	IMAGEMANAGER->addFrameImage("player_bullet_fire_L", L"image/player_bullet_fire_L.png", 540, 202, 2, 1);
@@ -122,8 +127,16 @@ HRESULT playGround::init()
 	
 	// 
 	IMAGEMANAGER->addFrameImage("gacha", L"image/gacha.png", 744, 278, 8, 1);
+	
+	// effect swing
+	IMAGEMANAGER->addFrameImage("swing", L"image/swing.png", 514, 154, 4, 2);
+	IMAGEMANAGER->addFrameImage("swing_updown", L"image/swing_updown.png", 304, 240, 2, 2);
+	
+	
 
+	
 
+	_isPlaying = false;
 
 	_player = new player;
 	_player->init();
@@ -156,6 +169,9 @@ HRESULT playGround::init()
 	_player->loadData();
 	_enemyManager->loadData();
 	_objManager->loadData();
+
+
+	_title = IMAGEMANAGER->findImage("title");
 	
 	return S_OK;
 }
@@ -163,6 +179,8 @@ HRESULT playGround::init()
 void playGround::release()
 {
 	gameNode::release();
+
+	
 
 	SAFE_RELEASE(_player);
 	SAFE_DELETE(_player);
@@ -179,29 +197,40 @@ void playGround::release()
 
 void playGround::update()
 {
-	if ( KEYMANAGER->isOnceKeyDown(VK_F1) )
-	{
-		_isDebugMode = !_isDebugMode;
-
-		if (_isDebugMode)
-		{
-			if (KEYMANAGER->isOnceKeyDown('R'))
-			{
-				release();
-
-				init();
-				return;
-			}
-		}
-	}
-
 	gameNode::update();
 
-	_player->update();
-	_objManager->update();
-	_enemyManager->update();
-	_bulletManager->update();
-	_uiManager->update();
+	if ( KEYMANAGER->isOnceKeyDown(VK_RETURN) )
+	{
+		if( !_isPlaying )
+			_isPlaying = true;
+	}
+
+
+
+	if ( _isPlaying )
+	{
+		if ( KEYMANAGER->isOnceKeyDown(VK_F1) )
+		{
+			_isDebugMode = !_isDebugMode;
+
+			if (_isDebugMode)
+			{
+				if (KEYMANAGER->isOnceKeyDown('R'))
+				{
+					release();
+
+					init();
+					return;
+				}
+			}
+		}
+
+		_player->update();
+		_objManager->update();
+		_enemyManager->update();
+		_bulletManager->update();
+		_uiManager->update();
+	}
 }
 
 void playGround::render()
@@ -212,18 +241,25 @@ void playGround::render()
 	//===========================================================================
 	//				##		여기에 코드 작성(Start)		##
 
-	_objManager->render();
-	_enemyManager->render();
-	_bulletManager->render();
-	_player->render();
-	_uiManager->render();
+	if ( _isPlaying )
+	{
+		_objManager->render();
+		_enemyManager->render();
+		_bulletManager->render();
+		_player->render();
+		_uiManager->render();
+	}
+	else
+	{
+		_title->render(CAMERA->getPosX(), CAMERA->getPosY());
+	}
 
 	//D2DMANAGER->_renderTarget->CreateLayer()
 	//				##		여기에 코드 작성(End)		##
 	//===========================================================================
 	//카메라 정보 출력
 	
-	if ( _isDebugMode )
+	if ( _isPlaying && _isDebugMode )
 	{
 		WCHAR str[128];
 		swprintf_s(str, L"cameraX : %.1f / %.1f", CAMERA->getPosX(), ( float )( MAPSIZEX - WINSIZEX ));
